@@ -1,0 +1,3250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SONDRIFT — Sound & Sensation Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=DM+Sans:wght@200;300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --black: #080808;
+    --off-black: #111111;
+    --dark: #1c1c1c;
+    --charcoal: #2e2e2e;
+    --mid: #525252;
+    --light-mid: #808080;
+    --silver: #adadad;
+    --off-white: #e6e6e6;
+    --white: #f4f4f4;
+    --accent: #c8c8c8;
+    --accent-dim: #909090;
+    --accent-pale: #181818;
+    --gold: #d4a853;
+    --gold-dim: #a07828;
+    --gold-pale: #1e1608;
+    --serif: 'Playfair Display', Georgia, serif;
+    --sans: 'DM Sans', sans-serif;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--off-white);
+    font-family: var(--sans);
+    font-weight: 300;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* Custom cursor */
+  .cursor {
+    position: fixed;
+    width: 8px; height: 8px;
+    background: var(--white);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s ease, width 0.2s ease, height 0.2s ease, background 0.2s ease;
+  }
+  .cursor-ring {
+    position: fixed;
+    width: 36px; height: 36px;
+    border: 1px solid rgba(200,200,200,0.4);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    transform: translate(-50%, -50%);
+    transition: all 0.15s ease;
+  }
+  body:hover .cursor { opacity: 1; }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 3px; }
+  ::-webkit-scrollbar-track { background: var(--black); }
+  ::-webkit-scrollbar-thumb { background: var(--charcoal); }
+
+  /* Nav */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 2rem 4rem;
+    display: flex; align-items: center; justify-content: space-between;
+    background: linear-gradient(to bottom, rgba(10,10,10,0.95) 0%, transparent 100%);
+    transition: all 0.4s ease;
+  }
+  nav.scrolled {
+    padding: 1.2rem 4rem;
+    background: rgba(10,10,10,0.97);
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .logo {
+    font-family: var(--serif);
+    font-size: 1.4rem;
+    font-weight: 400;
+    letter-spacing: 0.15em;
+    color: var(--white);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0;
+  }
+  .logo .son {
+    color: var(--silver);
+    font-style: italic;
+    font-weight: 400;
+  }
+  .logo .drift {
+    color: var(--white);
+    font-style: normal;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+  }
+  .logo .logo-mark {
+    width: 5px; height: 5px;
+    background: var(--gold);
+    border-radius: 50%;
+    display: inline-block;
+    margin: 0 2px 5px 2px;
+    flex-shrink: 0;
+  }
+  .nav-links {
+    display: flex; gap: 3rem; list-style: none;
+  }
+  .nav-links a {
+    font-family: var(--sans);
+    font-size: 0.7rem;
+    font-weight: 400;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--silver);
+    text-decoration: none;
+    transition: color 0.3s;
+  }
+  .nav-links a:hover { color: var(--accent); }
+  .nav-cta {
+    font-size: 0.65rem;
+    font-weight: 400;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--black);
+    background: var(--white);
+    padding: 0.7rem 1.8rem;
+    border: none;
+    cursor: none;
+    transition: background 0.3s, color 0.3s;
+    text-decoration: none;
+  }
+  .nav-cta:hover { background: var(--silver); color: var(--black); }
+
+  /* Hero */
+  .hero {
+    min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* === BACKGROUND IMAGE LAYER === */
+  .hero-bg-img {
+    position: absolute; inset: 0; z-index: 0;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    transition: opacity 0.8s ease;
+    opacity: 0;
+  }
+  .hero-bg-img.loaded { opacity: 1; }
+
+  /* Dark overlay — sits above image, below content. Keeps text legible. */
+  .hero-overlay {
+    position: absolute; inset: 0; z-index: 1;
+    background: linear-gradient(
+      to bottom,
+      rgba(10,10,10,0.55) 0%,
+      rgba(10,10,10,0.40) 40%,
+      rgba(10,10,10,0.65) 100%
+    );
+    transition: background 0.4s ease;
+  }
+  /* Vignette ring — softens edges regardless of image */
+  .hero-overlay::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at center, transparent 40%, rgba(10,10,10,0.7) 100%);
+  }
+
+  .hero-bg {
+    position: absolute; inset: 0; z-index: 0;
+    background: radial-gradient(ellipse at 30% 55%, rgba(255,255,255,0.03) 0%, transparent 55%),
+                radial-gradient(ellipse at 70% 20%, rgba(255,255,255,0.02) 0%, transparent 45%),
+                var(--black);
+    transition: opacity 0.8s ease;
+  }
+  .hero-bg.hidden { opacity: 0; pointer-events: none; }
+
+  .hero-lines {
+    position: absolute; inset: 0; z-index: 1;
+    background-image: 
+      linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+    background-size: 80px 80px;
+    transition: opacity 0.8s ease;
+  }
+  .hero-lines.hidden { opacity: 0; }
+
+  /* === IMAGE UPLOAD PANEL === */
+  .bg-upload-panel {
+    position: absolute; bottom: 5.5rem; right: 2.5rem; z-index: 10;
+    display: flex; flex-direction: column; align-items: flex-end; gap: 0.6rem;
+  }
+  .bg-upload-btn {
+    display: flex; align-items: center; gap: 0.6rem;
+    background: rgba(10,10,10,0.75);
+    border: 1px solid rgba(200,200,200,0.3);
+    color: var(--accent);
+    padding: 0.55rem 1rem;
+    font-family: var(--sans); font-size: 0.58rem;
+    font-weight: 400; letter-spacing: 0.2em; text-transform: uppercase;
+    cursor: none; transition: all 0.3s;
+    backdrop-filter: blur(8px);
+  }
+  .bg-upload-btn:hover {
+    background: rgba(200,200,200,0.12);
+    border-color: var(--accent);
+  }
+  .bg-upload-btn svg { width: 13px; height: 13px; flex-shrink: 0; }
+
+  /* Overlay strength slider */
+  .overlay-controls {
+    display: none;
+    background: rgba(10,10,10,0.82);
+    border: 1px solid rgba(255,255,255,0.08);
+    padding: 1rem 1.2rem;
+    backdrop-filter: blur(12px);
+    min-width: 200px;
+  }
+  .overlay-controls.visible { display: block; }
+  .overlay-controls label {
+    display: block; font-size: 0.55rem; letter-spacing: 0.2em;
+    text-transform: uppercase; color: var(--mid); margin-bottom: 0.5rem;
+  }
+  .overlay-controls input[type=range] {
+    width: 100%; accent-color: var(--accent);
+    background: none; cursor: none;
+  }
+  .overlay-val {
+    font-size: 0.65rem; color: var(--accent);
+    text-align: right; margin-top: 0.3rem; font-family: var(--serif);
+    font-style: italic;
+  }
+  .overlay-divider { height: 1px; background: rgba(255,255,255,0.06); margin: 0.8rem 0; }
+  .btn-remove-bg {
+    width: 100%; background: none;
+    border: 1px solid rgba(255,255,255,0.1);
+    color: var(--mid); font-family: var(--sans);
+    font-size: 0.55rem; letter-spacing: 0.2em; text-transform: uppercase;
+    padding: 0.4rem; cursor: none; transition: all 0.3s;
+  }
+  .btn-remove-bg:hover { border-color: rgba(255,80,80,0.4); color: #ff6b6b; }
+
+  /* Tooltip hint */
+  .bg-hint {
+    font-size: 0.55rem; color: var(--mid); letter-spacing: 0.1em;
+    text-align: right; opacity: 0.7;
+  }
+  .hero-content {
+    position: relative; z-index: 2;
+    text-align: center;
+    max-width: 900px;
+    padding: 0 2rem;
+    animation: fadeUp 1.2s ease forwards;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .hero-eyebrow {
+    font-size: 0.65rem;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--silver);
+    margin-bottom: 2.5rem;
+    display: flex; align-items: center; justify-content: center; gap: 1.5rem;
+  }
+  .hero-eyebrow::before, .hero-eyebrow::after {
+    content: '';
+    width: 40px; height: 1px;
+    background: var(--silver);
+    opacity: 0.4;
+  }
+  .hero-title {
+    font-family: var(--serif);
+    font-size: clamp(3.5rem, 9vw, 8rem);
+    font-weight: 300;
+    line-height: 0.95;
+    letter-spacing: -0.01em;
+    color: var(--white);
+    margin-bottom: 1rem;
+  }
+  .hero-title em {
+    font-style: italic;
+    color: var(--accent);
+  }
+  .hero-subtitle {
+    font-family: var(--serif);
+    font-size: clamp(1.1rem, 2vw, 1.6rem);
+    font-weight: 300;
+    font-style: italic;
+    color: var(--silver);
+    margin-bottom: 3.5rem;
+    letter-spacing: 0.02em;
+  }
+  .hero-actions {
+    display: flex; gap: 1.5rem; justify-content: center; align-items: center; flex-wrap: wrap;
+  }
+  .btn-primary {
+    background: var(--white);
+    color: var(--black);
+    padding: 1rem 2.5rem;
+    font-size: 0.65rem;
+    font-weight: 500;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    text-decoration: none;
+    border: none;
+    cursor: none;
+    transition: all 0.3s;
+    display: inline-block;
+  }
+  .btn-primary:hover { background: var(--silver); color: var(--black); transform: translateY(-2px); }
+  .btn-ghost {
+    background: transparent;
+    color: var(--silver);
+    padding: 1rem 2.5rem;
+    font-size: 0.65rem;
+    font-weight: 400;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    text-decoration: none;
+    border: 1px solid rgba(255,255,255,0.2);
+    cursor: none;
+    transition: all 0.3s;
+    display: inline-block;
+  }
+  .btn-ghost:hover { border-color: var(--white); color: var(--white); transform: translateY(-2px); }
+
+  .hero-scroll {
+    position: absolute; bottom: 3rem; left: 50%;
+    transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center; gap: 0.8rem;
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:0.4} 50%{opacity:0.9} }
+  .hero-scroll span {
+    font-size: 0.55rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--mid);
+  }
+  .scroll-line {
+    width: 1px; height: 40px;
+    background: linear-gradient(to bottom, var(--accent), transparent);
+  }
+
+  /* Sections */
+  section { padding: 8rem 4rem; }
+  .section-inner { max-width: 1200px; margin: 0 auto; }
+
+  .section-label {
+    font-size: 0.6rem; letter-spacing: 0.35em; text-transform: uppercase;
+    color: var(--silver); margin-bottom: 1.5rem;
+    display: flex; align-items: center; gap: 1rem;
+  }
+  .section-label::after {
+    content: ''; flex: 1; max-width: 60px; height: 1px;
+    background: var(--silver); opacity: 0.3;
+  }
+  .section-title {
+    font-family: var(--serif);
+    font-size: clamp(2.2rem, 4vw, 3.5rem);
+    font-weight: 300;
+    line-height: 1.1;
+    color: var(--white);
+    margin-bottom: 1.5rem;
+  }
+  .section-title em { font-style: italic; color: var(--accent); }
+  .section-body {
+    font-size: 0.9rem;
+    line-height: 1.9;
+    color: var(--light-mid);
+    max-width: 560px;
+  }
+
+  /* About */
+  .about { background: var(--off-black); }
+  .about-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 8rem; align-items: center;
+  }
+  .about-visual {
+    position: relative; aspect-ratio: 3/4;
+  }
+  .about-box {
+    position: absolute; inset: 0;
+    border: 1px solid rgba(200,200,200,0.15);
+  }
+  .about-box::before {
+    content: '';
+    position: absolute; top: 20px; left: 20px; right: -20px; bottom: -20px;
+    border: 1px solid rgba(200,200,200,0.06);
+  }
+  .about-inner {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    justify-content: center; align-items: center; gap: 2rem;
+    background: linear-gradient(135deg, rgba(200,200,200,0.07) 0%, rgba(224,168,74,0.03) 100%);
+  }
+  .wave-viz {
+    display: flex; align-items: center; gap: 3px; height: 60px;
+  }
+  .wave-bar {
+    width: 3px; background: var(--white);
+    border-radius: 2px; opacity: 0.7;
+    animation: wave-anim 1.4s ease-in-out infinite;
+  }
+  .wave-bar:nth-child(2) { animation-delay: 0.1s; }
+  .wave-bar:nth-child(3) { animation-delay: 0.2s; }
+  .wave-bar:nth-child(4) { animation-delay: 0.3s; }
+  .wave-bar:nth-child(5) { animation-delay: 0.2s; }
+  .wave-bar:nth-child(6) { animation-delay: 0.1s; }
+  .wave-bar:nth-child(7) { animation-delay: 0.0s; }
+  .wave-bar:nth-child(8) { animation-delay: 0.15s; }
+  .wave-bar:nth-child(9) { animation-delay: 0.25s; }
+  .wave-bar:nth-child(10) { animation-delay: 0.35s; }
+  @keyframes wave-anim {
+    0%,100% { height: 8px; opacity: 0.3; }
+    50% { height: 50px; opacity: 0.8; }
+  }
+  .about-stat {
+    font-family: var(--serif);
+    font-size: 0.85rem; letter-spacing: 0.1em;
+    color: var(--silver); text-align: center;
+  }
+  .about-stat strong {
+    display: block; font-size: 2.5rem; font-weight: 300;
+    color: var(--accent); font-style: italic; line-height: 1;
+    margin-bottom: 0.3rem;
+  }
+
+  /* Shop */
+  .shop { background: var(--black); }
+  .tabs {
+    display: flex; gap: 0; margin-bottom: 4rem;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .tab {
+    padding: 1rem 2rem;
+    font-size: 0.65rem; font-weight: 400;
+    letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--mid); background: none; border: none;
+    cursor: none; transition: color 0.3s;
+    position: relative;
+  }
+  .tab::after {
+    content: ''; position: absolute; bottom: -1px; left: 0; right: 0;
+    height: 1px; background: var(--white);
+    transform: scaleX(0); transition: transform 0.3s;
+  }
+  .tab.active { color: var(--accent); }
+  .tab.active::after { transform: scaleX(1); }
+  .tab:hover { color: var(--silver); }
+
+  .tab-content { display: none; }
+  .tab-content.active { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; }
+
+  .product-card {
+    background: var(--off-black);
+    overflow: hidden;
+    transition: transform 0.4s ease;
+    position: relative;
+  }
+  .product-card:hover { transform: translateY(-4px); }
+  .product-thumb {
+    aspect-ratio: 1;
+    background: var(--dark);
+    display: flex; align-items: center; justify-content: center;
+    position: relative; overflow: hidden;
+  }
+  .product-thumb::before {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(200,200,200,0.08) 0%, transparent 60%);
+    transition: opacity 0.4s;
+  }
+  .product-card:hover .product-thumb::before { opacity: 0; }
+  .product-icon {
+    width: 48px; height: 48px;
+    opacity: 0.25; transition: opacity 0.4s, transform 0.4s;
+  }
+  .product-card:hover .product-icon { opacity: 0.5; transform: scale(1.1); }
+  .product-body { padding: 1.5rem; }
+  .product-type {
+    font-size: 0.55rem; letter-spacing: 0.3em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 0.5rem;
+  }
+  .product-name {
+    font-family: var(--serif); font-size: 1.2rem; font-weight: 400;
+    color: var(--white); margin-bottom: 0.4rem; line-height: 1.2;
+  }
+  .product-desc {
+    font-size: 0.78rem; color: var(--light-mid); line-height: 1.7;
+    margin-bottom: 1.2rem;
+  }
+  .product-footer {
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .product-price {
+    font-family: var(--serif); font-size: 1.4rem; font-weight: 300;
+    color: var(--white);
+  }
+  .product-price span { font-size: 0.8rem; color: var(--mid); }
+  .btn-add {
+    background: none; border: 1px solid rgba(255,255,255,0.2);
+    color: var(--silver); padding: 0.5rem 1.2rem;
+    font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase;
+    cursor: none; transition: all 0.3s;
+  }
+  .btn-add:hover { background: var(--white); color: var(--black); border-color: var(--white); }
+  .badge-new {
+    position: absolute; top: 1rem; right: 1rem;
+    background: rgba(255,255,255,0.12); color: var(--white);
+    border: 1px solid rgba(255,255,255,0.2);
+    font-size: 0.55rem; letter-spacing: 0.2em; text-transform: uppercase;
+    padding: 0.3rem 0.7rem;
+  }
+
+  /* Pricing */
+  .pricing { background: var(--off-black); }
+  .pricing-intro {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 6rem; margin-bottom: 5rem; align-items: end;
+  }
+  .pricing-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px;
+  }
+  .plan-card {
+    background: var(--dark);
+    padding: 3rem 2.5rem;
+    position: relative; overflow: hidden;
+    transition: transform 0.4s;
+  }
+  .plan-card:hover { transform: translateY(-6px); }
+  .plan-card.featured {
+    background: var(--charcoal);
+    border-top: 2px solid var(--white);
+  }
+  .plan-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0;
+    height: 100%;
+    background: linear-gradient(180deg, rgba(200,200,200,0.04) 0%, transparent 50%);
+  }
+  .plan-badge {
+    font-size: 0.55rem; letter-spacing: 0.25em; text-transform: uppercase;
+    color: var(--black); background: var(--white);
+    padding: 0.3rem 0.8rem; display: inline-block;
+    margin-bottom: 2rem;
+  }
+  .plan-name {
+    font-family: var(--serif); font-size: 2rem; font-weight: 300;
+    color: var(--white); margin-bottom: 0.5rem;
+  }
+  .plan-tagline {
+    font-size: 0.78rem; color: var(--light-mid);
+    margin-bottom: 2rem; line-height: 1.6;
+  }
+  .plan-price {
+    font-family: var(--serif); font-size: 3.5rem; font-weight: 300;
+    color: var(--white); line-height: 1; margin-bottom: 0.5rem;
+  }
+  .plan-price sup {
+    font-size: 1.2rem; vertical-align: super; color: var(--silver);
+  }
+  .plan-period {
+    font-size: 0.7rem; color: var(--mid); letter-spacing: 0.1em;
+    margin-bottom: 2.5rem;
+  }
+  .plan-divider {
+    height: 1px; background: rgba(255,255,255,0.06); margin-bottom: 2rem;
+  }
+  .plan-features { list-style: none; margin-bottom: 2.5rem; }
+  .plan-features li {
+    font-size: 0.8rem; color: var(--silver);
+    padding: 0.6rem 0; border-bottom: 1px solid rgba(255,255,255,0.04);
+    display: flex; align-items: center; gap: 0.8rem; line-height: 1.4;
+  }
+  .plan-features li::before {
+    content: ''; width: 5px; height: 5px;
+    background: var(--white); border-radius: 50%; flex-shrink: 0;
+  }
+  .plan-features li.dim { color: var(--charcoal); }
+  .plan-features li.dim::before { background: var(--charcoal); }
+  .btn-plan {
+    width: 100%; padding: 1rem;
+    font-size: 0.65rem; font-weight: 400;
+    letter-spacing: 0.2em; text-transform: uppercase;
+    cursor: none; transition: all 0.3s; border: none;
+  }
+  .btn-plan-ghost {
+    background: none; color: var(--silver);
+    border: 1px solid rgba(255,255,255,0.12);
+  }
+  .btn-plan-ghost:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-plan-solid {
+    background: var(--charcoal); color: var(--silver);
+  }
+  .btn-plan-solid:hover { background: var(--silver); color: var(--white); }
+
+  /* Custom */
+  .custom { background: var(--black); }
+  .custom-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 6rem; align-items: center;
+  }
+  .custom-steps { margin-top: 3rem; }
+  .custom-step {
+    display: flex; gap: 1.5rem; padding: 1.8rem 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  .step-num {
+    font-family: var(--serif); font-size: 0.8rem; font-style: italic;
+    color: var(--accent); opacity: 0.6; min-width: 24px; padding-top: 2px;
+  }
+  .step-content h4 {
+    font-family: var(--serif); font-size: 1.1rem; font-weight: 400;
+    color: var(--white); margin-bottom: 0.4rem;
+  }
+  .step-content p {
+    font-size: 0.8rem; color: var(--light-mid); line-height: 1.7;
+  }
+  .custom-form-preview {
+    background: var(--off-black);
+    border: 1px solid rgba(255,255,255,0.06);
+    padding: 3rem;
+  }
+  .form-title {
+    font-family: var(--serif); font-size: 1.5rem; font-weight: 300;
+    color: var(--white); margin-bottom: 0.5rem;
+  }
+  .form-sub {
+    font-size: 0.75rem; color: var(--light-mid); margin-bottom: 2.5rem;
+  }
+  .form-group { margin-bottom: 1.5rem; }
+  .form-label {
+    display: block; font-size: 0.6rem; letter-spacing: 0.2em;
+    text-transform: uppercase; color: var(--mid); margin-bottom: 0.6rem;
+  }
+  .form-input, .form-select, .form-textarea {
+    width: 100%; background: var(--dark);
+    border: 1px solid rgba(255,255,255,0.08);
+    color: var(--off-white); padding: 0.8rem 1rem;
+    font-family: var(--sans); font-size: 0.85rem; font-weight: 300;
+    outline: none; transition: border-color 0.3s;
+    appearance: none;
+  }
+  .form-input:focus, .form-select:focus, .form-textarea:focus {
+    border-color: var(--accent);
+  }
+  .form-textarea { resize: none; height: 100px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+  /* Testimonials */
+  .testimonials { background: var(--off-black); padding: 6rem 4rem; }
+  .testimonials-inner { max-width: 900px; margin: 0 auto; text-align: center; }
+  .testimonials h2 {
+    font-family: var(--serif); font-size: clamp(1.8rem, 3vw, 2.5rem);
+    font-weight: 300; color: var(--white); margin-bottom: 4rem;
+  }
+  .testimonials h2 em { font-style: italic; color: var(--accent); }
+  .testimonials-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px;
+    margin-bottom: 3rem;
+  }
+  .testimonial {
+    background: var(--dark); padding: 2.5rem;
+    text-align: left;
+  }
+  .testimonial-text {
+    font-family: var(--serif); font-size: 1rem; font-style: italic;
+    color: var(--silver); line-height: 1.8; margin-bottom: 1.5rem;
+  }
+  .testimonial-author {
+    font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--accent);
+  }
+  .testimonial-stars {
+    color: var(--gold); font-size: 0.7rem; margin-bottom: 1rem;
+    letter-spacing: 0.1em;
+  }
+
+  /* Footer */
+  footer {
+    background: var(--off-black);
+    border-top: 1px solid rgba(255,255,255,0.05);
+    padding: 5rem 4rem 3rem;
+  }
+  .footer-grid {
+    max-width: 1200px; margin: 0 auto;
+    display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 4rem;
+    margin-bottom: 4rem;
+  }
+  .footer-brand .logo { display: block; margin-bottom: 1.2rem; }
+  .footer-brand p {
+    font-size: 0.8rem; color: var(--mid); line-height: 1.8; max-width: 280px;
+  }
+  .footer-col h5 {
+    font-size: 0.6rem; letter-spacing: 0.25em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 1.5rem;
+  }
+  .footer-col ul { list-style: none; }
+  .footer-col ul li { margin-bottom: 0.8rem; }
+  .footer-col ul li a {
+    font-size: 0.8rem; color: var(--mid); text-decoration: none;
+    transition: color 0.3s;
+  }
+  .footer-col ul li a:hover { color: var(--silver); }
+  .footer-bottom {
+    max-width: 1200px; margin: 0 auto;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    padding-top: 2rem;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .footer-bottom p { font-size: 0.7rem; color: var(--mid); }
+
+  /* Ambient */
+  .ambient-bar {
+    background: var(--accent-pale);
+    border-top: 1px solid rgba(200,200,200,0.15);
+    border-bottom: 1px solid rgba(200,200,200,0.15);
+    padding: 1.2rem 4rem;
+    display: flex; align-items: center; justify-content: center; gap: 3rem;
+    overflow: hidden;
+  }
+  .ambient-item {
+    font-size: 0.6rem; letter-spacing: 0.25em; text-transform: uppercase;
+    color: var(--accent); white-space: nowrap; opacity: 0.8;
+  }
+  .ambient-dot {
+    width: 3px; height: 3px; background: var(--gold);
+    border-radius: 50%; opacity: 0.5; flex-shrink: 0;
+  }
+
+  /* Animations */
+  .fade-in {
+    opacity: 0; transform: translateY(20px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+  .fade-in.visible { opacity: 1; transform: translateY(0); }
+
+  /* ============================================
+     PRICING MODALS
+  ============================================ */
+  .modal-backdrop {
+    position: fixed; inset: 0; z-index: 500;
+    background: rgba(5,5,5,0.88);
+    backdrop-filter: blur(6px);
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.4s ease;
+    padding: 2rem;
+  }
+  .modal-backdrop.open { opacity: 1; pointer-events: all; }
+
+  .modal {
+    background: var(--off-black);
+    border: 1px solid rgba(255,255,255,0.07);
+    max-width: 860px; width: 100%;
+    max-height: 88vh; overflow-y: auto;
+    position: relative;
+    transform: translateY(20px);
+    transition: transform 0.4s ease;
+    scrollbar-width: thin; scrollbar-color: var(--charcoal) transparent;
+  }
+  .modal-backdrop.open .modal { transform: translateY(0); }
+
+  .modal-header {
+    padding: 2.5rem 3rem 1.5rem;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem;
+    position: sticky; top: 0; background: var(--off-black); z-index: 2;
+  }
+  .modal-header-left .modal-eyebrow {
+    font-size: 0.58rem; letter-spacing: 0.3em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 0.5rem;
+  }
+  .modal-title {
+    font-family: var(--serif); font-size: 2rem; font-weight: 300;
+    color: var(--white); line-height: 1.1;
+  }
+  .modal-title em { font-style: italic; color: var(--accent); }
+  .modal-header-right { display: flex; align-items: center; gap: 0.8rem; flex-shrink: 0; }
+
+  .btn-modal-close {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+    color: var(--silver); cursor: none;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.25s; flex-shrink: 0;
+  }
+  .btn-modal-close:hover { background: rgba(255,80,80,0.15); border-color: rgba(255,80,80,0.3); color: #ff6b6b; }
+  .btn-modal-close svg { width: 12px; height: 12px; stroke: currentColor; }
+
+  .btn-edit-toggle {
+    display: flex; align-items: center; gap: 0.5rem;
+    background: rgba(200,200,200,0.08); border: 1px solid rgba(200,200,200,0.25);
+    color: var(--accent); padding: 0.45rem 1rem;
+    font-family: var(--sans); font-size: 0.58rem;
+    font-weight: 400; letter-spacing: 0.18em; text-transform: uppercase;
+    cursor: none; transition: all 0.25s;
+  }
+  .btn-edit-toggle:hover { background: rgba(200,200,200,0.16); }
+  .btn-edit-toggle.editing { background: rgba(200,200,200,0.2); border-color: var(--accent); }
+  .btn-edit-toggle svg { width: 11px; height: 11px; stroke: currentColor; flex-shrink: 0; }
+
+  .modal-body { padding: 2.5rem 3rem; }
+
+  /* ── Shop pricing grid ── */
+  .shop-price-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; margin-bottom: 2rem;
+  }
+  .shop-price-card {
+    background: var(--dark); padding: 1.8rem 1.5rem;
+    transition: background 0.3s;
+  }
+  .spc-category {
+    font-size: 0.55rem; letter-spacing: 0.28em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 1.2rem;
+    padding-bottom: 0.8rem; border-bottom: 1px solid rgba(200,200,200,0.15);
+  }
+  .spc-item {
+    display: flex; align-items: baseline; justify-content: space-between;
+    padding: 0.65rem 0; border-bottom: 1px solid rgba(255,255,255,0.04);
+    gap: 0.5rem;
+  }
+  .spc-item:last-child { border-bottom: none; }
+  .spc-name {
+    font-size: 0.8rem; color: var(--silver); line-height: 1.3; flex: 1;
+  }
+  .spc-price {
+    font-family: var(--serif); font-size: 1.1rem; font-weight: 300;
+    color: var(--white); white-space: nowrap; flex-shrink: 0;
+  }
+  .spc-sub {
+    font-size: 0.65rem; color: var(--mid); margin-top: 0.2rem;
+  }
+
+  /* Editable price input */
+  .price-input {
+    font-family: var(--serif); font-size: 1.1rem; font-weight: 300;
+    color: var(--accent); background: rgba(200,200,200,0.06);
+    border: 1px solid rgba(200,200,200,0.3);
+    padding: 0.15rem 0.4rem; width: 72px;
+    text-align: right; outline: none;
+    display: none;
+    transition: border-color 0.2s;
+  }
+  .price-input:focus { border-color: var(--accent); background: rgba(200,200,200,0.1); }
+  .editing-mode .price-input { display: inline-block; }
+  .editing-mode .spc-price { display: none; }
+  .editing-mode .plan-price-display { display: none; }
+  .editing-mode .plan-price-input { display: flex !important; }
+
+  /* ── Subscription plan cards in modal ── */
+  .modal-plans { display: grid; grid-template-columns: repeat(3,1fr); gap: 2px; }
+  .modal-plan {
+    background: var(--dark); padding: 2rem 1.8rem;
+    position: relative; transition: background 0.3s;
+  }
+  .modal-plan.featured { background: var(--charcoal); border-top: 2px solid var(--white); }
+  .modal-plan-badge {
+    font-size: 0.5rem; letter-spacing: 0.22em; text-transform: uppercase;
+    background: var(--charcoal); color: var(--silver);
+    padding: 0.2rem 0.6rem; display: inline-block; margin-bottom: 1.2rem;
+  }
+  .modal-plan-name {
+    font-family: var(--serif); font-size: 1.5rem; font-weight: 300;
+    color: var(--white); margin-bottom: 0.3rem;
+  }
+  .modal-plan-tagline {
+    font-size: 0.72rem; color: var(--light-mid); line-height: 1.5;
+    margin-bottom: 1.2rem;
+  }
+  .plan-price-display {
+    display: flex; align-items: baseline; gap: 0.2rem; margin-bottom: 0.3rem;
+  }
+  .plan-price-display .currency {
+    font-size: 0.8rem; color: var(--silver); font-family: var(--sans);
+  }
+  .plan-price-display .amount {
+    font-family: var(--serif); font-size: 2.4rem; font-weight: 300; color: var(--white);
+    line-height: 1;
+  }
+  .plan-price-display .cents {
+    font-size: 1rem; color: var(--silver);
+  }
+  .plan-price-input {
+    display: none; align-items: center; gap: 0.4rem; margin-bottom: 0.3rem;
+  }
+  .plan-price-input .currency-label {
+    font-size: 0.7rem; color: var(--mid);
+  }
+  .plan-price-edit {
+    font-family: var(--serif); font-size: 1.6rem; font-weight: 300;
+    color: var(--accent); background: rgba(200,200,200,0.06);
+    border: 1px solid rgba(200,200,200,0.3);
+    padding: 0.2rem 0.5rem; width: 100px;
+    outline: none; transition: border-color 0.2s;
+  }
+  .plan-price-edit:focus { border-color: var(--accent); background: rgba(200,200,200,0.1); }
+  .plan-period-label {
+    font-size: 0.65rem; color: var(--mid); letter-spacing: 0.1em;
+    margin-bottom: 1.2rem;
+  }
+  .modal-plan-divider { height: 1px; background: rgba(255,255,255,0.06); margin-bottom: 1.2rem; }
+  .modal-plan-features { list-style: none; }
+  .modal-plan-features li {
+    font-size: 0.75rem; color: var(--silver); padding: 0.45rem 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    display: flex; align-items: flex-start; gap: 0.6rem; line-height: 1.4;
+  }
+  .modal-plan-features li:last-child { border-bottom: none; }
+  .modal-plan-features li::before {
+    content: ''; width: 4px; height: 4px; background: var(--white);
+    border-radius: 50%; flex-shrink: 0; margin-top: 0.4rem;
+  }
+  .modal-plan-features li.dim { color: var(--charcoal); }
+  .modal-plan-features li.dim::before { background: var(--charcoal); }
+
+  .modal-plan-cta {
+    margin-top: 1.5rem; width: 100%; padding: 0.85rem;
+    font-family: var(--sans); font-size: 0.62rem; font-weight: 400;
+    letter-spacing: 0.18em; text-transform: uppercase; cursor: none;
+    transition: all 0.3s; border: none;
+  }
+  .cta-ghost { background: none; color: var(--silver); border: 1px solid rgba(255,255,255,0.1); }
+  .cta-ghost:hover { border-color: var(--accent); color: var(--accent); }
+  .cta-solid { background: var(--white); color: var(--black); }
+  .cta-solid:hover { background: var(--silver); color: var(--black); }
+
+  /* Edit-mode name input */
+  .plan-name-input {
+    font-family: var(--serif); font-size: 1.5rem; font-weight: 300;
+    color: var(--accent); background: rgba(200,200,200,0.06);
+    border: 1px solid rgba(200,200,200,0.3);
+    padding: 0.2rem 0.5rem; width: 100%;
+    outline: none; margin-bottom: 0.5rem;
+    display: none;
+  }
+  .editing-mode .plan-name-input { display: block; }
+  .editing-mode .modal-plan-name { display: none; }
+
+  .edit-save-bar {
+    display: none; align-items: center; justify-content: space-between;
+    padding: 1rem 3rem; background: rgba(200,200,200,0.06);
+    border-top: 1px solid rgba(200,200,200,0.15);
+    position: sticky; bottom: 0;
+  }
+  .edit-save-bar.visible { display: flex; }
+  .edit-save-bar p { font-size: 0.72rem; color: var(--light-mid); font-style: italic; }
+  .btn-save-prices {
+    background: var(--white); color: var(--black);
+    border: none; padding: 0.65rem 2rem;
+    font-family: var(--sans); font-size: 0.6rem;
+    font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase;
+    cursor: none; transition: all 0.25s;
+  }
+  .btn-save-prices:hover { background: var(--silver); color: var(--black); }
+
+  /* Modal note */
+  .modal-note {
+    font-size: 0.72rem; color: var(--mid); line-height: 1.8;
+    padding: 1.2rem 1.5rem; background: rgba(255,255,255,0.02);
+    border-left: 2px solid rgba(200,200,200,0.2);
+    margin-top: 1.5rem; font-style: italic;
+  }
+
+  /* Upload zone inside product thumb */
+  .media-upload-zone {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 0.5rem; z-index: 3;
+    opacity: 0; transition: opacity 0.3s;
+    background: rgba(10,10,10,0.6);
+    backdrop-filter: blur(4px);
+  }
+  .product-card:hover .media-upload-zone { opacity: 1; }
+  .media-upload-zone.has-media { opacity: 0 !important; }
+  .media-upload-zone.has-media:hover { opacity: 1 !important; }
+
+  .upload-zone-btn {
+    background: rgba(200,200,200,0.15);
+    border: 1px solid rgba(200,200,200,0.4);
+    color: var(--accent);
+    padding: 0.5rem 1.1rem;
+    font-family: var(--sans); font-size: 0.6rem;
+    font-weight: 400; letter-spacing: 0.2em; text-transform: uppercase;
+    cursor: none; transition: all 0.25s;
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+  .upload-zone-btn:hover { background: rgba(200,200,200,0.3); }
+  .upload-zone-btn svg { width: 12px; height: 12px; flex-shrink: 0; }
+  .upload-zone-label {
+    font-size: 0.55rem; color: var(--light-mid);
+    letter-spacing: 0.15em; text-transform: uppercase;
+  }
+
+  /* ── AUDIO PLAYER ── */
+  .audio-player {
+    display: none;
+    position: absolute; inset: 0; z-index: 4;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 1.2rem;
+    background: linear-gradient(to top, rgba(10,10,10,0.92) 0%, rgba(10,10,10,0.2) 60%, transparent 100%);
+  }
+  .audio-player.active { display: flex; }
+
+  .audio-waveform {
+    display: flex; align-items: center; gap: 2px;
+    height: 36px; margin-bottom: 0.8rem; overflow: hidden;
+  }
+  .audio-bar {
+    flex: 1; background: var(--white);
+    border-radius: 1px; opacity: 0.35;
+    transition: opacity 0.1s, height 0.05s;
+    min-height: 3px;
+  }
+  .audio-bar.active { opacity: 0.9; }
+
+  .audio-controls {
+    display: flex; align-items: center; gap: 0.8rem;
+  }
+  .audio-play-btn {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: var(--white); border: none; cursor: none;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; transition: background 0.2s, transform 0.2s;
+  }
+  .audio-play-btn:hover { background: var(--silver); transform: scale(1.08); }
+  .audio-play-btn svg { width: 12px; height: 12px; fill: var(--black); }
+
+  .audio-progress-wrap {
+    flex: 1; position: relative; height: 3px;
+    background: rgba(255,255,255,0.12); cursor: none;
+  }
+  .audio-progress-fill {
+    position: absolute; left: 0; top: 0; bottom: 0;
+    background: var(--white); width: 0%; transition: width 0.1s linear;
+    pointer-events: none;
+  }
+  .audio-progress-thumb {
+    position: absolute; top: 50%; width: 10px; height: 10px;
+    background: var(--white); border-radius: 50%;
+    transform: translate(-50%, -50%);
+    left: 0%; transition: left 0.1s linear;
+    pointer-events: none;
+  }
+
+  .audio-time {
+    font-size: 0.6rem; color: var(--silver);
+    font-variant-numeric: tabular-nums; min-width: 64px;
+    text-align: right; font-family: var(--sans);
+  }
+  .audio-remove {
+    width: 20px; height: 20px; border-radius: 50%;
+    background: rgba(255,255,255,0.08); border: none; cursor: none;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s;
+  }
+  .audio-remove:hover { background: rgba(255,80,80,0.25); }
+  .audio-remove svg { width: 8px; height: 8px; stroke: var(--silver); }
+  .audio-filename {
+    font-size: 0.6rem; color: var(--silver);
+    letter-spacing: 0.1em; margin-bottom: 0.5rem;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    max-width: 100%;
+  }
+
+  /* ── VIDEO PLAYER ── */
+  .video-player {
+    display: none;
+    position: absolute; inset: 0; z-index: 4;
+    background: #000;
+    flex-direction: column;
+  }
+  .video-player.active { display: flex; }
+  .video-player video {
+    width: 100%; height: 100%;
+    object-fit: cover; display: block;
+  }
+  .video-controls {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    padding: 0.8rem 1rem;
+    background: linear-gradient(to top, rgba(10,10,10,0.9) 0%, transparent 100%);
+    display: flex; align-items: center; gap: 0.7rem;
+    opacity: 0; transition: opacity 0.3s;
+  }
+  .product-card:hover .video-controls { opacity: 1; }
+  .video-play-btn {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--white); border: none; cursor: none;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; transition: all 0.2s;
+  }
+  .video-play-btn:hover { background: var(--silver); transform: scale(1.1); }
+  .video-play-btn svg { width: 10px; height: 10px; fill: var(--black); }
+  .video-prog-wrap {
+    flex: 1; height: 3px; background: rgba(255,255,255,0.15);
+    position: relative; cursor: none;
+  }
+  .video-prog-fill {
+    position: absolute; left: 0; top: 0; bottom: 0;
+    background: var(--white); width: 0%;
+  }
+  .video-time {
+    font-size: 0.58rem; color: var(--silver);
+    font-variant-numeric: tabular-nums; min-width: 60px; text-align: right;
+  }
+  .video-vol-btn {
+    background: none; border: none; cursor: none;
+    color: var(--silver); transition: color 0.2s; padding: 0;
+    display: flex; align-items: center;
+  }
+  .video-vol-btn:hover { color: var(--accent); }
+  .video-vol-btn svg { width: 13px; height: 13px; stroke: currentColor; }
+  .video-remove {
+    width: 20px; height: 20px; border-radius: 50%;
+    background: rgba(255,255,255,0.08); border: none; cursor: none;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s;
+  }
+  .video-remove:hover { background: rgba(255,80,80,0.25); }
+  .video-remove svg { width: 8px; height: 8px; stroke: var(--silver); }
+
+  /* Sample badge */
+  .badge-sample {
+    position: absolute; top: 1rem; left: 1rem; z-index: 5;
+    background: rgba(200,200,200,0.2);
+    border: 1px solid rgba(200,200,200,0.4);
+    color: var(--accent); font-size: 0.5rem;
+    letter-spacing: 0.2em; text-transform: uppercase;
+    padding: 0.25rem 0.6rem;
+  }
+
+  /* ============================================
+     INLINE CONTENT EDITOR
+  ============================================ */
+  .editable-wrap {
+    position: relative;
+  }
+  /* Pencil trigger — appears on card hover */
+  .edit-card-btn {
+    position: absolute; top: 0.9rem; right: 0.9rem; z-index: 5;
+    width: 26px; height: 26px; border-radius: 50%;
+    background: rgba(20,20,20,0.85);
+    border: 1px solid rgba(200,200,200,0.25);
+    color: var(--accent); cursor: none;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; transition: opacity 0.25s, background 0.2s, border-color 0.2s;
+  }
+  .product-card:hover .edit-card-btn { opacity: 1; }
+  .edit-card-btn:hover { background: rgba(200,200,200,0.15); border-color: var(--accent); }
+  .edit-card-btn.active { opacity: 1; background: rgba(200,200,200,0.2); border-color: var(--accent); }
+  .edit-card-btn svg { width: 11px; height: 11px; stroke: currentColor; }
+
+  /* Editable name — spans that become inputs */
+  .product-name.editable,
+  .product-desc.editable {
+    position: relative;
+  }
+  /* Inline text inputs */
+  .inline-name-input {
+    font-family: var(--serif);
+    font-size: 1.2rem; font-weight: 400;
+    color: var(--white);
+    background: rgba(200,200,200,0.06);
+    border: none; border-bottom: 1px solid rgba(200,200,200,0.5);
+    outline: none; width: 100%;
+    padding: 0.1rem 0.2rem;
+    line-height: 1.2; margin-bottom: 0;
+    display: none;
+    transition: border-color 0.2s;
+  }
+  .inline-name-input:focus { border-bottom-color: var(--accent); }
+
+  .inline-desc-input {
+    font-family: var(--sans);
+    font-size: 0.78rem; font-weight: 300;
+    color: var(--light-mid);
+    background: rgba(200,200,200,0.04);
+    border: none; border-bottom: 1px solid rgba(200,200,200,0.3);
+    outline: none; width: 100%;
+    padding: 0.1rem 0.2rem;
+    line-height: 1.7; margin-bottom: 0;
+    resize: none; overflow: hidden;
+    display: none;
+    transition: border-color 0.2s;
+    min-height: 60px;
+  }
+  .inline-desc-input:focus { border-bottom-color: var(--accent); }
+
+  /* When card is in edit mode */
+  .product-card.card-editing .product-name { display: none; }
+  .product-card.card-editing .inline-name-input { display: block; }
+  .product-card.card-editing .product-desc { display: none; }
+  .product-card.card-editing .inline-desc-input { display: block; }
+
+  /* Save hint bar */
+  .card-edit-hint {
+    display: none;
+    font-size: 0.58rem; color: var(--accent); letter-spacing: 0.15em;
+    text-transform: uppercase; margin-top: 0.5rem;
+    opacity: 0.7;
+  }
+  .product-card.card-editing .card-edit-hint { display: block; }
+
+  /* Saved flash */
+  .card-saved-flash {
+    position: absolute; bottom: 0.8rem; left: 50%;
+    transform: translateX(-50%);
+    background: rgba(200,200,200,0.9);
+    color: var(--black); font-size: 0.58rem;
+    letter-spacing: 0.2em; text-transform: uppercase;
+    padding: 0.35rem 1rem; white-space: nowrap;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.3s;
+    z-index: 6;
+  }
+  .card-saved-flash.show { opacity: 1; }
+
+  /* ============================================
+     SUBSCRIPTION PLAN EDITOR
+  ============================================ */
+  .plan-edit-btn {
+    position: absolute; top: 1rem; right: 1rem; z-index: 6;
+    width: 28px; height: 28px; border-radius: 50%;
+    background: rgba(20,20,20,0.9);
+    border: 1px solid rgba(255,255,255,0.15);
+    color: var(--silver); cursor: none;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; transition: opacity 0.25s, border-color 0.2s, background 0.2s;
+  }
+  .plan-card:hover .plan-edit-btn { opacity: 1; }
+  .plan-edit-btn.active {
+    opacity: 1; background: rgba(255,255,255,0.1);
+    border-color: var(--white); color: var(--white);
+  }
+  .plan-edit-btn svg { width: 11px; height: 11px; stroke: currentColor; fill: none; }
+
+  /* Editable fields */
+  .plan-field-input {
+    background: transparent;
+    border: none; border-bottom: 1px solid rgba(255,255,255,0.2);
+    color: var(--white); outline: none; width: 100%;
+    font-family: var(--serif); font-size: 2rem; font-weight: 300;
+    padding: 0.1rem 0;
+    display: none; transition: border-color 0.2s;
+    margin-bottom: 0;
+  }
+  .plan-field-input:focus { border-bottom-color: var(--white); }
+
+  .plan-tagline-input {
+    background: transparent;
+    border: none; border-bottom: 1px solid rgba(255,255,255,0.12);
+    color: var(--light-mid); outline: none; width: 100%;
+    font-family: var(--sans); font-size: 0.72rem; font-weight: 300;
+    padding: 0.1rem 0; line-height: 1.5;
+    display: none; transition: border-color 0.2s;
+  }
+  .plan-tagline-input:focus { border-bottom-color: var(--silver); }
+
+  .plan-price-inline-wrap {
+    display: none; align-items: center; gap: 0.4rem;
+    margin-bottom: 0.3rem;
+  }
+  .plan-price-inline-wrap .currency-tag {
+    font-size: 0.75rem; color: var(--mid); font-family: var(--sans);
+  }
+  .plan-price-inline-input {
+    background: transparent;
+    border: none; border-bottom: 1px solid rgba(255,255,255,0.2);
+    color: var(--white); outline: none;
+    font-family: var(--serif); font-size: 2.6rem; font-weight: 300;
+    width: 120px; padding: 0;
+    transition: border-color 0.2s;
+  }
+  .plan-price-inline-input:focus { border-bottom-color: var(--white); }
+
+  /* When plan card is in edit mode */
+  .plan-card.plan-editing .plan-name { display: none !important; }
+  .plan-card.plan-editing .plan-field-input { display: block; }
+  .plan-card.plan-editing .plan-tagline { display: none; }
+  .plan-card.plan-editing .plan-tagline-input { display: block; }
+  .plan-card.plan-editing .plan-price { display: none; }
+  .plan-card.plan-editing .plan-price-inline-wrap { display: flex; }
+
+  /* Feature list editor */
+  .plan-features-editor {
+    display: none; list-style: none; margin-bottom: 1.5rem;
+  }
+  .plan-card.plan-editing .plan-features { display: none; }
+  .plan-card.plan-editing .plan-features-editor { display: block; }
+
+  .feature-edit-row {
+    display: flex; align-items: center; gap: 0.5rem;
+    padding: 0.3rem 0; border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .feature-edit-input {
+    flex: 1; background: transparent;
+    border: none; outline: none;
+    font-family: var(--sans); font-size: 0.78rem; font-weight: 300;
+    color: var(--silver); padding: 0.2rem 0;
+    transition: color 0.2s;
+  }
+  .feature-edit-input:focus { color: var(--white); }
+  .feature-edit-input.dim-feature { color: var(--mid); }
+
+  .feature-del-btn {
+    width: 18px; height: 18px; flex-shrink: 0;
+    background: none; border: 1px solid rgba(255,255,255,0.1);
+    color: var(--mid); cursor: none; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s; font-size: 10px; line-height: 1;
+  }
+  .feature-del-btn:hover { border-color: rgba(255,80,80,0.4); color: #ff6b6b; }
+
+  .feature-dim-toggle {
+    width: 18px; height: 18px; flex-shrink: 0;
+    background: none; border: 1px solid rgba(255,255,255,0.1);
+    color: var(--mid); cursor: none; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s; font-size: 9px;
+  }
+  .feature-dim-toggle.is-dim { border-color: rgba(255,255,255,0.2); color: var(--silver); }
+  .feature-dim-toggle:hover { border-color: var(--silver); color: var(--white); }
+
+  .add-feature-row {
+    display: flex; align-items: center; gap: 0.5rem;
+    padding: 0.5rem 0; margin-top: 0.3rem;
+  }
+  .add-feature-input {
+    flex: 1; background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1); outline: none;
+    font-family: var(--sans); font-size: 0.75rem;
+    color: var(--silver); padding: 0.35rem 0.6rem;
+    transition: border-color 0.2s;
+  }
+  .add-feature-input::placeholder { color: var(--mid); }
+  .add-feature-input:focus { border-color: var(--silver); }
+  .add-feature-btn {
+    background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15);
+    color: var(--silver); cursor: none; padding: 0.35rem 0.8rem;
+    font-size: 0.6rem; letter-spacing: 0.1em; transition: all 0.2s;
+  }
+  .add-feature-btn:hover { background: rgba(255,255,255,0.15); color: var(--white); }
+
+  /* Plan edit hint and saved flash */
+  .plan-edit-hint {
+    display: none; font-size: 0.55rem; color: var(--mid);
+    letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 1rem;
+  }
+  .plan-card.plan-editing .plan-edit-hint { display: block; }
+
+  .plan-saved-flash {
+    position: absolute; bottom: 1rem; left: 50%;
+    transform: translateX(-50%);
+    background: var(--white); color: var(--black);
+    font-size: 0.55rem; letter-spacing: 0.2em; text-transform: uppercase;
+    padding: 0.3rem 1rem; white-space: nowrap;
+    opacity: 0; pointer-events: none; z-index: 7;
+    transition: opacity 0.3s;
+  }
+  .plan-saved-flash.show { opacity: 1; }
+    nav { padding: 1.5rem 2rem; }
+    nav.scrolled { padding: 1rem 2rem; }
+    .nav-links { display: none; }
+    section { padding: 5rem 2rem; }
+    .about-grid, .custom-grid, .pricing-intro { grid-template-columns: 1fr; gap: 3rem; }
+    .tab-content.active { grid-template-columns: 1fr; }
+    .pricing-grid, .testimonials-grid { grid-template-columns: 1fr; }
+    .footer-grid { grid-template-columns: 1fr 1fr; }
+    .hero { padding: 6rem 2rem; }
+    .ambient-bar { padding: 1.2rem 2rem; gap: 1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- Nav -->
+<nav id="nav">
+  <a href="#" class="logo"><span class="son">Son</span><span class="logo-mark"></span><span class="drift">drift</span></a>
+  <ul class="nav-links">
+    <li><a href="#shop">Shop</a></li>
+    <li><a href="#pricing">Plans</a></li>
+    <li><a href="#custom">Custom</a></li>
+    <li><a href="#about">About</a></li>
+  </ul>
+  <a href="#pricing" class="nav-cta">Begin</a>
+</nav>
+
+<!-- Hero -->
+<section class="hero" id="hero">
+  <!-- Layer 0: solid gradient fallback -->
+  <div class="hero-bg" id="heroBg"></div>
+  <!-- Layer 1: uploaded background image -->
+  <div class="hero-bg-img" id="heroBgImg"></div>
+  <!-- Layer 2: dark overlay (keeps text legible over any image) -->
+  <div class="hero-overlay" id="heroOverlay"></div>
+  <!-- Layer 3: subtle grid lines -->
+  <div class="hero-lines" id="heroLines"></div>
+
+  <!-- Layer 4: text content (always on top) -->
+  <div class="hero-content">
+    <div class="hero-eyebrow">Sound · Sensation · Story</div>
+    <h1 class="hero-title">Where sound<br>meets <em>silence</em></h1>
+    <p class="hero-subtitle">Bespoke ASMR experiences crafted to soothe your senses</p>
+    <div class="hero-actions">
+      <button class="btn-primary" onclick="openModal('shopModal')">Explore Collection</button>
+      <button class="btn-ghost" onclick="openModal('subsModal')">Custom Subscription</button>
+    </div>
+  </div>
+
+  <!-- Background image upload panel -->
+  <div class="bg-upload-panel">
+    <div class="overlay-controls" id="overlayControls">
+      <label>Overlay Darkness</label>
+      <input type="range" min="0" max="90" value="50" id="overlaySlider" step="1">
+      <div class="overlay-val" id="overlayVal">50%</div>
+      <div class="overlay-divider"></div>
+      <label style="margin-bottom:0.5rem">Image Position</label>
+      <select id="posSelect" style="width:100%;background:var(--dark);border:1px solid rgba(255,255,255,0.1);color:var(--silver);padding:0.4rem 0.6rem;font-family:var(--sans);font-size:0.75rem;outline:none;cursor:none;margin-bottom:0.8rem">
+        <option value="center">Center</option>
+        <option value="top">Top</option>
+        <option value="bottom">Bottom</option>
+        <option value="left">Left</option>
+        <option value="right">Right</option>
+        <option value="top left">Top Left</option>
+        <option value="top right">Top Right</option>
+      </select>
+      <div class="overlay-divider"></div>
+      <button class="btn-remove-bg" id="removeBgBtn">Remove Image</button>
+    </div>
+    <div style="display:flex;gap:0.5rem;align-items:center">
+      <span class="bg-hint" id="bgHint">Click to set hero background</span>
+      <button class="bg-upload-btn" id="bgUploadBtn" onclick="document.getElementById('bgFileInput').click()">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="1" y="4" width="14" height="10" rx="1"/>
+          <path d="M5 4V3a3 3 0 016 0v1"/>
+          <path d="M8 8v4M6 10l2-2 2 2"/>
+        </svg>
+        Set Background
+      </button>
+    </div>
+  </div>
+  <input type="file" id="bgFileInput" accept="image/*" style="display:none">
+
+  <div class="hero-scroll">
+    <div class="scroll-line"></div>
+    <span>Scroll</span>
+  </div>
+</section>
+
+<!-- Ambient Bar -->
+<div class="ambient-bar">
+  <span class="ambient-item">Soundscapes</span>
+  <div class="ambient-dot"></div>
+  <span class="ambient-item">Voice Recordings</span>
+  <div class="ambient-dot"></div>
+  <span class="ambient-item">Sensory Images</span>
+  <div class="ambient-dot"></div>
+  <span class="ambient-item">Ambient Video</span>
+  <div class="ambient-dot"></div>
+  <span class="ambient-item">Custom Creations</span>
+  <div class="ambient-dot"></div>
+  <span class="ambient-item">Personal Delivery</span>
+  <div class="ambient-dot"></div>
+  <span class="ambient-item">Instant Downloads</span>
+</div>
+
+<!-- About -->
+<section class="about" id="about">
+  <div class="section-inner">
+    <div class="about-grid">
+      <div class="about-visual fade-in">
+        <div class="about-box">
+          <div class="about-inner">
+            <div class="wave-viz">
+              <div class="wave-bar" style="height:12px"></div>
+              <div class="wave-bar" style="height:28px"></div>
+              <div class="wave-bar" style="height:44px"></div>
+              <div class="wave-bar" style="height:36px"></div>
+              <div class="wave-bar" style="height:50px"></div>
+              <div class="wave-bar" style="height:32px"></div>
+              <div class="wave-bar" style="height:44px"></div>
+              <div class="wave-bar" style="height:20px"></div>
+              <div class="wave-bar" style="height:38px"></div>
+              <div class="wave-bar" style="height:14px"></div>
+            </div>
+            <div class="about-stat">
+              <strong>6,000+</strong>
+              Moments of stillness delivered
+            </div>
+            <div class="about-stat">
+              <strong>98%</strong>
+              Report deeper relaxation
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="fade-in">
+        <div class="section-label">Our Philosophy</div>
+        <h2 class="section-title">Sound as a form of <em>drift</em></h2>
+        <p class="section-body">
+          Sondrift began with a single question: what if sound could transport you completely?
+          Not just relax — but carry you somewhere else entirely. We craft bespoke ASMR experiences —
+          whispered voices, layered soundscapes, and sensory visuals —
+          made with the patience and precision of a studio artist.
+        </p>
+        <br>
+        <p class="section-body">
+          Every piece in our collection is built from intention. Every custom request
+          is treated as a personal commission. This is not content — it is a journey.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Shop -->
+<section class="shop" id="shop">
+  <div class="section-inner">
+    <div class="fade-in" style="margin-bottom:3rem">
+      <div class="section-label">Ready to Download</div>
+      <h2 class="section-title">The <em>Collection</em></h2>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab(event,'sounds')">Soundbites</button>
+      <button class="tab" onclick="switchTab(event,'images')">Images</button>
+      <button class="tab" onclick="switchTab(event,'videos')">Videos</button>
+    </div>
+
+    <!-- Sounds -->
+    <div class="tab-content active" id="sounds">
+      <!-- Sound card 1 -->
+      <div class="product-card fade-in" id="sc1">
+        <div class="product-thumb">
+          <svg class="product-icon" viewBox="0 0 48 48" fill="none">
+            <circle cx="24" cy="24" r="20" stroke="#c8c8c8" stroke-width="1"/>
+            <path d="M18 16 L18 32 L32 24 Z" fill="#c8c8c8"/>
+          </svg>
+          <div class="badge-new">New</div>
+          <!-- Audio player (hidden until file uploaded) -->
+          <div class="audio-player" id="ap1">
+            <div class="badge-sample">Sample</div>
+            <div class="audio-filename" id="af1"></div>
+            <div class="audio-waveform" id="aw1"></div>
+            <div class="audio-controls">
+              <button class="audio-play-btn" id="apb1">
+                <svg viewBox="0 0 12 12"><path d="M3 2L10 6L3 10Z"/></svg>
+              </button>
+              <div class="audio-progress-wrap" id="apr1">
+                <div class="audio-progress-fill" id="apf1"></div>
+                <div class="audio-progress-thumb" id="apt1"></div>
+              </div>
+              <div class="audio-time" id="at1">0:00 / 0:00</div>
+              <button class="audio-remove" id="arm1" title="Remove">
+                <svg viewBox="0 0 8 8" fill="none"><path d="M1 1L7 7M7 1L1 7" stroke-width="1.5"/></svg>
+              </button>
+            </div>
+          </div>
+          <!-- Upload zone -->
+          <div class="media-upload-zone" id="muz1">
+            <button class="upload-zone-btn" onclick="document.getElementById('mf1').click()">
+              <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 8V2M3 5l3-3 3 3"/><path d="M1 10h10"/></svg>
+              Upload Sample
+            </button>
+            <span class="upload-zone-label">MP3 · WAV · AAC</span>
+          </div>
+          <input type="file" id="mf1" accept="audio/*" style="display:none" onchange="loadAudio('1',this)">
+        </div>
+        <div class="product-body editable-wrap">
+          <button class="edit-card-btn" id="ecb1" onclick="toggleCardEdit('sc1')" title="Edit name & description">
+            <svg viewBox="0 0 12 12" fill="none"><path d="M7.5 1.5L10.5 4.5L4 11H1V8L7.5 1.5Z" stroke-width="1.2"/><path d="M6 3L9 6" stroke-width="1.2"/></svg>
+          </button>
+          <div class="product-type" id="pt1">Soundbite · 4 min</div>
+          <div class="product-name" id="sn1">Rain on Still Water</div>
+          <input class="inline-name-input" id="sni1" type="text" value="Rain on Still Water" maxlength="48">
+          <div class="product-desc" id="sd1">Gentle rainfall meeting a glassy lake. Layered field recording with soft ambient undertones.</div>
+          <textarea class="inline-desc-input" id="sdi1" maxlength="160">Gentle rainfall meeting a glassy lake. Layered field recording with soft ambient undertones.</textarea>
+          <div class="card-edit-hint">Press Enter or click ✓ to save</div>
+          <div class="card-saved-flash" id="sf1">Saved</div>
+          <div class="product-footer">
+            <div class="product-price"><span>SGD </span>6.90</div>
+            <button class="btn-add" onclick="if(document.getElementById('sc1').classList.contains('card-editing')){saveCardEdit('sc1');return;}">Add</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sound card 2 -->
+      <div class="product-card fade-in" id="sc2">
+        <div class="product-thumb">
+          <svg class="product-icon" viewBox="0 0 48 48" fill="none">
+            <path d="M8 24 Q16 12 24 24 Q32 36 40 24" stroke="#c8c8c8" stroke-width="1.5" fill="none"/>
+            <path d="M8 30 Q16 18 24 30 Q32 42 40 30" stroke="#c8c8c8" stroke-width="0.8" fill="none" opacity="0.5"/>
+          </svg>
+          <div class="audio-player" id="ap2">
+            <div class="badge-sample">Sample</div>
+            <div class="audio-filename" id="af2"></div>
+            <div class="audio-waveform" id="aw2"></div>
+            <div class="audio-controls">
+              <button class="audio-play-btn" id="apb2">
+                <svg viewBox="0 0 12 12"><path d="M3 2L10 6L3 10Z"/></svg>
+              </button>
+              <div class="audio-progress-wrap" id="apr2">
+                <div class="audio-progress-fill" id="apf2"></div>
+                <div class="audio-progress-thumb" id="apt2"></div>
+              </div>
+              <div class="audio-time" id="at2">0:00 / 0:00</div>
+              <button class="audio-remove" id="arm2">
+                <svg viewBox="0 0 8 8" fill="none"><path d="M1 1L7 7M7 1L1 7" stroke-width="1.5"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="media-upload-zone" id="muz2">
+            <button class="upload-zone-btn" onclick="document.getElementById('mf2').click()">
+              <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 8V2M3 5l3-3 3 3"/><path d="M1 10h10"/></svg>
+              Upload Sample
+            </button>
+            <span class="upload-zone-label">MP3 · WAV · AAC</span>
+          </div>
+          <input type="file" id="mf2" accept="audio/*" style="display:none" onchange="loadAudio('2',this)">
+        </div>
+        <div class="product-body editable-wrap">
+          <button class="edit-card-btn" id="ecb2" onclick="toggleCardEdit('sc2')" title="Edit name & description">
+            <svg viewBox="0 0 12 12" fill="none"><path d="M7.5 1.5L10.5 4.5L4 11H1V8L7.5 1.5Z" stroke-width="1.2"/><path d="M6 3L9 6" stroke-width="1.2"/></svg>
+          </button>
+          <div class="product-type" id="pt2">Soundbite · 6 min</div>
+          <div class="product-name" id="sn2">Whispered Dusk</div>
+          <input class="inline-name-input" id="sni2" type="text" value="Whispered Dusk" maxlength="48">
+          <div class="product-desc" id="sd2">Soft whispering voice paired with the fading warmth of a late afternoon. Pure vocal ASMR.</div>
+          <textarea class="inline-desc-input" id="sdi2" maxlength="160">Soft whispering voice paired with the fading warmth of a late afternoon. Pure vocal ASMR.</textarea>
+          <div class="card-edit-hint">Press Enter or click ✓ to save</div>
+          <div class="card-saved-flash" id="sf2">Saved</div>
+          <div class="product-footer">
+            <div class="product-price"><span>SGD </span>6.90</div>
+            <button class="btn-add" onclick="if(document.getElementById('sc2').classList.contains('card-editing')){saveCardEdit('sc2');return;}">Add</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sound card 3 -->
+      <div class="product-card fade-in" id="sc3">
+        <div class="product-thumb">
+          <svg class="product-icon" viewBox="0 0 48 48" fill="none">
+            <rect x="10" y="20" width="4" height="8" fill="#c8c8c8" rx="2"/>
+            <rect x="18" y="14" width="4" height="20" fill="#c8c8c8" rx="2" opacity="0.8"/>
+            <rect x="26" y="18" width="4" height="12" fill="#c8c8c8" rx="2" opacity="0.6"/>
+            <rect x="34" y="22" width="4" height="6" fill="#c8c8c8" rx="2" opacity="0.4"/>
+          </svg>
+          <div class="audio-player" id="ap3">
+            <div class="badge-sample">Sample</div>
+            <div class="audio-filename" id="af3"></div>
+            <div class="audio-waveform" id="aw3"></div>
+            <div class="audio-controls">
+              <button class="audio-play-btn" id="apb3">
+                <svg viewBox="0 0 12 12"><path d="M3 2L10 6L3 10Z"/></svg>
+              </button>
+              <div class="audio-progress-wrap" id="apr3">
+                <div class="audio-progress-fill" id="apf3"></div>
+                <div class="audio-progress-thumb" id="apt3"></div>
+              </div>
+              <div class="audio-time" id="at3">0:00 / 0:00</div>
+              <button class="audio-remove" id="arm3">
+                <svg viewBox="0 0 8 8" fill="none"><path d="M1 1L7 7M7 1L1 7" stroke-width="1.5"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="media-upload-zone" id="muz3">
+            <button class="upload-zone-btn" onclick="document.getElementById('mf3').click()">
+              <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 8V2M3 5l3-3 3 3"/><path d="M1 10h10"/></svg>
+              Upload Sample
+            </button>
+            <span class="upload-zone-label">MP3 · WAV · AAC</span>
+          </div>
+          <input type="file" id="mf3" accept="audio/*" style="display:none" onchange="loadAudio('3',this)">
+        </div>
+        <div class="product-body editable-wrap">
+          <button class="edit-card-btn" id="ecb3" onclick="toggleCardEdit('sc3')" title="Edit name & description">
+            <svg viewBox="0 0 12 12" fill="none"><path d="M7.5 1.5L10.5 4.5L4 11H1V8L7.5 1.5Z" stroke-width="1.2"/><path d="M6 3L9 6" stroke-width="1.2"/></svg>
+          </button>
+          <div class="product-type" id="pt3">Bundle · 5 Soundbites</div>
+          <div class="product-name" id="sn3">Forest Floor Collection</div>
+          <input class="inline-name-input" id="sni3" type="text" value="Forest Floor Collection" maxlength="48">
+          <div class="product-desc" id="sd3">Five layered forest recordings — leaves, moss, distant water, wind through canopy, birdsong at dusk.</div>
+          <textarea class="inline-desc-input" id="sdi3" maxlength="160">Five layered forest recordings — leaves, moss, distant water, wind through canopy, birdsong at dusk.</textarea>
+          <div class="card-edit-hint">Press Enter or click ✓ to save</div>
+          <div class="card-saved-flash" id="sf3">Saved</div>
+          <div class="product-footer">
+            <div class="product-price"><span>SGD </span>24.90</div>
+            <button class="btn-add" onclick="if(document.getElementById('sc3').classList.contains('card-editing')){saveCardEdit('sc3');return;}">Add</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Images -->
+    <div class="tab-content" id="images">
+      <div class="product-card fade-in">
+        <div class="product-thumb" style="background: linear-gradient(135deg, #1a2520 0%, #0f1a16 100%);">
+          <svg class="product-icon" viewBox="0 0 48 48" fill="none">
+            <rect x="8" y="10" width="32" height="28" rx="1" stroke="#c8c8c8" stroke-width="1"/>
+            <circle cx="17" cy="19" r="4" stroke="#c8c8c8" stroke-width="1" opacity="0.6"/>
+            <path d="M8 32 L18 22 L28 30 L35 24 L40 30 L40 38 L8 38 Z" fill="#c8c8c8" opacity="0.15"/>
+          </svg>
+        </div>
+        <div class="product-body">
+          <div class="product-type">Image · High Resolution</div>
+          <div class="product-name">Mist Over Pebble</div>
+          <div class="product-desc">A single smooth stone resting in shallow water, morning mist rising. 4K digital art.</div>
+          <div class="product-footer">
+            <div class="product-price"><span>SGD </span>4.90</div>
+            <button class="btn-add">Add</button>
+          </div>
+        </div>
+      </div>
+      <div class="product-card fade-in">
+        <div class="product-thumb" style="background: linear-gradient(135deg, #1a1a22 0%, #0f0f18 100%);">
+          <svg class="product-icon" viewBox="0 0 48 48" fill="none">
+            <circle cx="24" cy="24" r="14" stroke="#c8c8c8" stroke-width="1" opacity="0.5"/>
+            <circle cx="24" cy="24" r="8" stroke="#c8c8c8" stroke-width="1" opacity="0.7"/>
+            <circle cx="24" cy="24" r="2" fill="#c8c8c8" opacity="0.9"/>
+          </svg>
+        </div>
+        <div class="product-body">
+          <div class="product-type">Image · High Resolution</div>
+          <div class="product-name">Concentric Calm</div>
+          <div class="product-desc">Geometric circles in deep charcoal and sage. Meditative visual anchor for practice or display.</div>
+          <div class="product-footer">
+            <div class="product-price"><span>SGD </span>4.90</div>
+            <button class="btn-add">Add</button>
+          </div>
+        </div>
+      </div>
+      <div class="product-card fade-in">
+        <div class="product-thumb" style="background: linear-gradient(135deg, #1e1a14 0%, #14120d 100%);">
+          <svg class="product-icon" viewBox="0 0 48 48" fill="none">
+            <path d="M24 8 C30 14 38 18 38 28 C38 36 32 42 24 42 C16 42 10 36 10 28 C10 18 18 14 24 8Z" stroke="#c8a96e" stroke-width="1" fill="none"/>
+          </svg>
+        </div>
+        <div class="product-body">
+          <div class="product-type">Bundle · 5 Images</div>
+          <div class="product-name">Golden Hour Series</div>
+          <div class="product-desc">Five warm-toned images in amber and ochre. Perfect for screens, prints, or digital wallpaper.</div>
+          <div class="product-footer">
+            <div class="product-price"><span>SGD </span>18.90</div>
+            <button class="btn-add">Add</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Videos -->
+    <div class="tab-content" id="videos">
+      <!-- Video card 1 -->
+      <div class="product-card fade-in" id="vc1">
+        <div class="product-thumb">
+          <svg class="product-icon" viewBox="0 0 48 48" fill="none">
+            <rect x="6" y="12" width="28" height="24" rx="1" stroke="#c8c8c8" stroke-width="1"/>
+            <path d="M34 19 L42 15 L42 33 L34 29 Z" stroke="#c8c8c8" stroke-width="1" fill="none"/>
+          </svg>
+          <div class="badge-new">New</div>
+          <div class="video-player" id="vp1">
+            <div class="badge-sample">Sample</div>
+            <video id="vel1" preload="metadata" playsinline></video>
+            <div class="video-controls">
+              <button class="video-play-btn" id="vpb1">
+                <svg viewBox="0 0 10 10"><path d="M2 1.5L8.5 5L2 8.5Z"/></svg>
+              </button>
+              <div class="video-prog-wrap" id="vpr1">
+                <div class="video-prog-fill" id="vpf1"></div>
+              </div>
+              <div class="video-time" id="vt1">0:00 / 0:00</div>
+              <button class="video-vol-btn" id="vvb1">
+                <svg viewBox="0 0 13 13" fill="none" stroke-width="1.2"><path d="M1 4.5H3.5L7 2V11L3.5 8.5H1V4.5Z"/><path d="M9 4.5C10.1 5.1 10.8 6 10.8 6.5C10.8 7 10.1 7.9 9 8.5"/></svg>
+              </button>
+              <button class="video-remove" id="vrm1">
+                <svg viewBox="0 0 8 8" fill="none"><path d="M1 1L7 7M7 1L1 7" stroke-width="1.5"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="media-upload-zone" id="vuz1">
+            <button class="upload-zone-btn" onclick="document.getElementById('vf1').click()">
+              <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 8V2M3 5l3-3 3 3"/><path d="M1 10h10"/></svg>
+              Upload Sample
+            </button>
+            <span class="upload-zone-label">MP4 · MOV · WEBM</span>
+          </div>
+          <input type="file" id="vf1" accept="video/*" style="display:none" onchange="loadVideo('1',this)">
+        </div>
+        <div class="product-body">
+          <div class="product-type">Video · 8 min</div>
+          <div class="product-name">Candle & Cedar</div>
+          <div class="product-desc">Close-up candleflame with crackling cedar wood audio. Warm, hypnotic, grounding.</div>
+          <div class="product-footer">
+            <div class="product-price"><span>SGD </span>12.90</div>
+            <button class="btn-add">Add</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Video card 2 -->
+      <div class="product-card fade-in" id="vc2">
+        <div class="product-thumb">
+          <svg class="product-icon" viewBox="0 0 48 48" fill="none">
+            <path d="M8 36 Q16 20 24 28 Q32 36 40 16" stroke="#c8c8c8" stroke-width="1.5" fill="none"/>
+            <circle cx="24" cy="10" r="6" stroke="#c8c8c8" stroke-width="1" opacity="0.5"/>
+          </svg>
+          <div class="video-player" id="vp2">
+            <div class="badge-sample">Sample</div>
+            <video id="vel2" preload="metadata" playsinline></video>
+            <div class="video-controls">
+              <button class="video-play-btn" id="vpb2">
+                <svg viewBox="0 0 10 10"><path d="M2 1.5L8.5 5L2 8.5Z"/></svg>
+              </button>
+              <div class="video-prog-wrap" id="vpr2">
+                <div class="video-prog-fill" id="vpf2"></div>
+              </div>
+              <div class="video-time" id="vt2">0:00 / 0:00</div>
+              <button class="video-vol-btn" id="vvb2">
+                <svg viewBox="0 0 13 13" fill="none" stroke-width="1.2"><path d="M1 4.5H3.5L7 2V11L3.5 8.5H1V4.5Z"/><path d="M9 4.5C10.1 5.1 10.8 6 10.8 6.5C10.8 7 10.1 7.9 9 8.5"/></svg>
+              </button>
+              <button class="video-remove" id="vrm2">
+                <svg viewBox="0 0 8 8" fill="none"><path d="M1 1L7 7M7 1L1 7" stroke-width="1.5"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="media-upload-zone" id="vuz2">
+            <button class="upload-zone-btn" onclick="document.getElementById('vf2').click()">
+              <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 8V2M3 5l3-3 3 3"/><path d="M1 10h10"/></svg>
+              Upload Sample
+            </button>
+            <span class="upload-zone-label">MP4 · MOV · WEBM</span>
+          </div>
+          <input type="file" id="vf2" accept="video/*" style="display:none" onchange="loadVideo('2',this)">
+        </div>
+        <div class="product-body">
+          <div class="product-type">Video · 5 min</div>
+          <div class="product-name">Salt Crystal Study</div>
+          <div class="product-desc">Extreme close-up of salt crystals in afternoon light. No dialogue. Pure visual ASMR.</div>
+          <div class="product-footer">
+            <div class="product-price"><span>SGD </span>12.90</div>
+            <button class="btn-add">Add</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Video card 3 -->
+      <div class="product-card fade-in" id="vc3">
+        <div class="product-thumb">
+          <svg class="product-icon" viewBox="0 0 48 48" fill="none">
+            <rect x="10" y="10" width="28" height="28" rx="14" stroke="#c8c8c8" stroke-width="1" opacity="0.4"/>
+            <rect x="16" y="16" width="16" height="16" rx="8" stroke="#c8c8c8" stroke-width="1" opacity="0.7"/>
+            <circle cx="24" cy="24" r="3" fill="#c8c8c8"/>
+          </svg>
+          <div class="video-player" id="vp3">
+            <div class="badge-sample">Sample</div>
+            <video id="vel3" preload="metadata" playsinline></video>
+            <div class="video-controls">
+              <button class="video-play-btn" id="vpb3">
+                <svg viewBox="0 0 10 10"><path d="M2 1.5L8.5 5L2 8.5Z"/></svg>
+              </button>
+              <div class="video-prog-wrap" id="vpr3">
+                <div class="video-prog-fill" id="vpf3"></div>
+              </div>
+              <div class="video-time" id="vt3">0:00 / 0:00</div>
+              <button class="video-vol-btn" id="vvb3">
+                <svg viewBox="0 0 13 13" fill="none" stroke-width="1.2"><path d="M1 4.5H3.5L7 2V11L3.5 8.5H1V4.5Z"/><path d="M9 4.5C10.1 5.1 10.8 6 10.8 6.5C10.8 7 10.1 7.9 9 8.5"/></svg>
+              </button>
+              <button class="video-remove" id="vrm3">
+                <svg viewBox="0 0 8 8" fill="none"><path d="M1 1L7 7M7 1L1 7" stroke-width="1.5"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="media-upload-zone" id="vuz3">
+            <button class="upload-zone-btn" onclick="document.getElementById('vf3').click()">
+              <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 8V2M3 5l3-3 3 3"/><path d="M1 10h10"/></svg>
+              Upload Sample
+            </button>
+            <span class="upload-zone-label">MP4 · MOV · WEBM</span>
+          </div>
+          <input type="file" id="vf3" accept="video/*" style="display:none" onchange="loadVideo('3',this)">
+        </div>
+        <div class="product-body">
+          <div class="product-type">Bundle · 3 Videos</div>
+          <div class="product-name">Still Life Trilogy</div>
+          <div class="product-desc">Three meditative videos — flowing ink in water, slow breath steam, sand patterns.</div>
+          <div class="product-footer">
+            <div class="product-price"><span>SGD </span>29.90</div>
+            <button class="btn-add">Add</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Pricing -->
+<section class="pricing" id="pricing">
+  <div class="section-inner">
+    <div class="pricing-intro fade-in">
+      <div>
+        <div class="section-label">Subscription Plans</div>
+        <h2 class="section-title">Your personal sound,<br><em>delivered</em> to you</h2>
+      </div>
+      <p class="section-body">
+        Each plan delivers freshly created, personal ASMR content straight to your inbox. 
+        Every piece is made exclusively for you — your name, your preferences, your calm.
+        Cancel or pause anytime.
+      </p>
+    </div>
+
+    <div class="pricing-grid">
+
+      <!-- Whisper -->
+      <div class="plan-card fade-in" id="pc-w" style="position:relative">
+        <button class="plan-edit-btn" id="peb-w" onclick="togglePlanEdit('w')" title="Edit plan">
+          <svg viewBox="0 0 12 12"><path d="M7.5 1.5L10.5 4.5L4 11H1V8L7.5 1.5Z" stroke-width="1.2"/><path d="M6 3L9 6" stroke-width="1.2"/></svg>
+        </button>
+        <div class="plan-name" id="pname-w">Whisper</div>
+        <input class="plan-field-input" id="pname-inp-w" type="text" value="Whisper" maxlength="28">
+        <div class="plan-tagline" id="ptagline-w">For those beginning their stillness practice</div>
+        <input class="plan-tagline-input" id="ptagline-inp-w" type="text" value="For those beginning their stillness practice" maxlength="60">
+        <div class="plan-price" id="pprice-w"><sup>SGD </sup>19<sup>.90</sup></div>
+        <div class="plan-price-inline-wrap" id="pprice-wrap-w">
+          <span class="currency-tag">SGD</span>
+          <input class="plan-price-inline-input" id="pprice-inp-w" type="number" step="0.10" value="19.90" min="0">
+        </div>
+        <div class="plan-period">per month</div>
+        <div class="plan-edit-hint">Click ✓ to save · Enter to confirm field</div>
+        <div class="plan-divider"></div>
+        <ul class="plan-features" id="pfeatures-w">
+          <li>2 custom soundbites per month</li>
+          <li>Personalised to your name &amp; mood</li>
+          <li>Standard 3–5 min duration</li>
+          <li>Delivered within 5 business days</li>
+          <li>MP3 + WAV formats included</li>
+          <li class="dim">Video content</li>
+          <li class="dim">Image delivery</li>
+          <li class="dim">Priority creation</li>
+        </ul>
+        <div class="plan-features-editor" id="pfedit-w"></div>
+        <div class="plan-saved-flash" id="psaved-w">Saved</div>
+        <button class="btn-plan btn-plan-ghost" id="pbtn-w">Choose Whisper</button>
+      </div>
+
+      <!-- Serenity (Featured) -->
+      <div class="plan-card featured fade-in" id="pc-s" style="position:relative">
+        <div class="plan-badge">Most Popular</div>
+        <button class="plan-edit-btn" id="peb-s" onclick="togglePlanEdit('s')" title="Edit plan">
+          <svg viewBox="0 0 12 12"><path d="M7.5 1.5L10.5 4.5L4 11H1V8L7.5 1.5Z" stroke-width="1.2"/><path d="M6 3L9 6" stroke-width="1.2"/></svg>
+        </button>
+        <div class="plan-name" id="pname-s">Serenity</div>
+        <input class="plan-field-input" id="pname-inp-s" type="text" value="Serenity" maxlength="28">
+        <div class="plan-tagline" id="ptagline-s">The complete sensory experience</div>
+        <input class="plan-tagline-input" id="ptagline-inp-s" type="text" value="The complete sensory experience" maxlength="60">
+        <div class="plan-price" id="pprice-s"><sup>SGD </sup>39<sup>.90</sup></div>
+        <div class="plan-price-inline-wrap" id="pprice-wrap-s">
+          <span class="currency-tag">SGD</span>
+          <input class="plan-price-inline-input" id="pprice-inp-s" type="number" step="0.10" value="39.90" min="0">
+        </div>
+        <div class="plan-period">per month</div>
+        <div class="plan-edit-hint">Click ✓ to save · Enter to confirm field</div>
+        <div class="plan-divider"></div>
+        <ul class="plan-features" id="pfeatures-s">
+          <li>2 custom soundbites per month</li>
+          <li>1 bespoke sensory image</li>
+          <li>1 custom ambient video (5 min)</li>
+          <li>Personalised to your preferences</li>
+          <li>Delivered within 4 business days</li>
+          <li>All formats included</li>
+          <li>Monthly mood questionnaire</li>
+          <li class="dim">Priority creation</li>
+        </ul>
+        <div class="plan-features-editor" id="pfedit-s"></div>
+        <div class="plan-saved-flash" id="psaved-s">Saved</div>
+        <button class="btn-plan btn-plan-solid" id="pbtn-s">Choose Serenity</button>
+      </div>
+
+      <!-- Sanctuary -->
+      <div class="plan-card fade-in" id="pc-sa" style="position:relative">
+        <button class="plan-edit-btn" id="peb-sa" onclick="togglePlanEdit('sa')" title="Edit plan">
+          <svg viewBox="0 0 12 12"><path d="M7.5 1.5L10.5 4.5L4 11H1V8L7.5 1.5Z" stroke-width="1.2"/><path d="M6 3L9 6" stroke-width="1.2"/></svg>
+        </button>
+        <div class="plan-name" id="pname-sa">Sanctuary</div>
+        <input class="plan-field-input" id="pname-inp-sa" type="text" value="Sanctuary" maxlength="28">
+        <div class="plan-tagline" id="ptagline-sa">Unlimited. Unhurried. Entirely yours.</div>
+        <input class="plan-tagline-input" id="ptagline-inp-sa" type="text" value="Unlimited. Unhurried. Entirely yours." maxlength="60">
+        <div class="plan-price" id="pprice-sa"><sup>SGD </sup>79<sup>.90</sup></div>
+        <div class="plan-price-inline-wrap" id="pprice-wrap-sa">
+          <span class="currency-tag">SGD</span>
+          <input class="plan-price-inline-input" id="pprice-inp-sa" type="number" step="0.10" value="79.90" min="0">
+        </div>
+        <div class="plan-period">per month</div>
+        <div class="plan-edit-hint">Click ✓ to save · Enter to confirm field</div>
+        <div class="plan-divider"></div>
+        <ul class="plan-features" id="pfeatures-sa">
+          <li>Unlimited custom requests</li>
+          <li>Soundbites, images &amp; videos</li>
+          <li>Priority 48-hour creation</li>
+          <li>Dedicated creation profile</li>
+          <li>Extended durations (up to 20 min)</li>
+          <li>Exclusive content not sold in shop</li>
+          <li>Monthly 1-on-1 brief call</li>
+          <li>Gift subscription option</li>
+        </ul>
+        <div class="plan-features-editor" id="pfedit-sa"></div>
+        <div class="plan-saved-flash" id="psaved-sa">Saved</div>
+        <button class="btn-plan btn-plan-ghost" id="pbtn-sa">Choose Sanctuary</button>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- Custom -->
+<section class="custom" id="custom">
+  <div class="section-inner">
+    <div class="custom-grid">
+      <div class="fade-in">
+        <div class="section-label">Bespoke Creation</div>
+        <h2 class="section-title">Tell us where you want<br>sound to <em>take you</em></h2>
+        <p class="section-body">
+          Every custom request is a collaboration. Share the feeling, the memory, the place you want to return to —
+          and we'll sculpt a soundscape, image, or video around it.
+        </p>
+        <div class="custom-steps">
+          <div class="custom-step">
+            <div class="step-num">01</div>
+            <div class="step-content">
+              <h4>Describe your vision</h4>
+              <p>Tell us your mood, preferred sounds, imagery, or even a memory. No brief is too abstract.</p>
+            </div>
+          </div>
+          <div class="custom-step">
+            <div class="step-num">02</div>
+            <div class="step-content">
+              <h4>We create, exclusively for you</h4>
+              <p>Our studio crafts your piece within your chosen plan's timeline. One revision included.</p>
+            </div>
+          </div>
+          <div class="custom-step">
+            <div class="step-num">03</div>
+            <div class="step-content">
+              <h4>Delivered to your inbox</h4>
+              <p>Your file arrives in full quality, yours to keep and return to whenever stillness calls.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="custom-form-preview fade-in">
+        <div class="form-title">Begin a Drift</div>
+        <div class="form-sub">For Sanctuary & Serenity members</div>
+        <div class="form-group">
+          <label class="form-label">Your Name</label>
+          <input type="text" class="form-input" placeholder="As you'd like it whispered">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Content Type</label>
+            <select class="form-select">
+              <option>Soundbite</option>
+              <option>Image</option>
+              <option>Video</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Mood</label>
+            <select class="form-select">
+              <option>Grounding</option>
+              <option>Sleep</option>
+              <option>Focus</option>
+              <option>Release</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Describe your stillness</label>
+          <textarea class="form-textarea" placeholder="A forest after rain. The sound of a train at night. A voice you almost remember..."></textarea>
+        </div>
+        <button class="btn-primary" style="width:100%; text-align:center; display:block">Send Request</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Testimonials -->
+<section class="testimonials">
+  <div class="testimonials-inner">
+    <h2>Where our listeners <em>drift</em></h2>
+    <div class="testimonials-grid fade-in">
+      <div class="testimonial">
+        <div class="testimonial-stars">★★★★★</div>
+        <div class="testimonial-text">"The custom voice recording felt impossibly personal. I've listened to it every night for three weeks."</div>
+        <div class="testimonial-author">Mei L. — Serenity · Sondrift</div>
+      </div>
+      <div class="testimonial">
+        <div class="testimonial-stars">★★★★★</div>
+        <div class="testimonial-text">"I described a memory from childhood and they turned it into a soundscape. I cried. In the best way."</div>
+        <div class="testimonial-author">James T. — Sanctuary · Sondrift</div>
+      </div>
+      <div class="testimonial">
+        <div class="testimonial-stars">★★★★★</div>
+        <div class="testimonial-text">"Finally — ASMR that doesn't feel mass-produced. This is art. The salt crystal video is perfect."</div>
+        <div class="testimonial-author">Priya R. — Shop · Sondrift</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <a href="#" class="logo"><span class="son">Son</span><span class="logo-mark"></span><span class="drift">drift</span></a>
+      <p>Sound experiences crafted for those who drift. Based in Singapore. Delivered worldwide.</p>
+    </div>
+    <div class="footer-col">
+      <h5>Shop</h5>
+      <ul>
+        <li><a href="#">Soundbites</a></li>
+        <li><a href="#">Images</a></li>
+        <li><a href="#">Videos</a></li>
+        <li><a href="#">Bundles</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h5>Plans</h5>
+      <ul>
+        <li><a href="#">Whisper</a></li>
+        <li><a href="#">Serenity</a></li>
+        <li><a href="#">Sanctuary</a></li>
+        <li><a href="#">Gift a Plan</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h5>Studio</h5>
+      <ul>
+        <li><a href="#">About</a></li>
+        <li><a href="#">Process</a></li>
+        <li><a href="#">FAQ</a></li>
+        <li><a href="#">Contact</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2026 Sondrift Studio. All rights reserved.</p>
+    <p style="color:var(--charcoal)">Privacy · Terms · Refund Policy</p>
+  </div>
+</footer>
+
+<!-- ============================================
+     SHOP PRICING MODAL
+============================================ -->
+<div class="modal-backdrop" id="shopModal">
+  <div class="modal" id="shopModalInner">
+    <div class="modal-header">
+      <div class="modal-header-left">
+        <div class="modal-eyebrow">Ready to Download</div>
+        <h2 class="modal-title">The <em>Collection</em> — Pricing</h2>
+      </div>
+      <div class="modal-header-right">
+        <button class="btn-edit-toggle" id="shopEditBtn" onclick="toggleEdit('shop')">
+          <svg viewBox="0 0 12 12" fill="none"><path d="M8.5 1.5L10.5 3.5L4 10H2V8L8.5 1.5Z"/><path d="M7 3L9 5"/></svg>
+          Edit Prices
+        </button>
+        <button class="btn-modal-close" onclick="closeModal('shopModal')">
+          <svg viewBox="0 0 12 12" fill="none"><path d="M2 2L10 10M10 2L2 10" stroke-width="1.5"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="modal-body" id="shopModalBody">
+
+      <div class="shop-price-grid">
+
+        <!-- Soundbites -->
+        <div class="shop-price-card">
+          <div class="spc-category">Soundbites</div>
+          <div class="spc-item">
+            <div>
+              <div class="spc-name">Single Soundbite</div>
+              <div class="spc-sub">2–6 min · MP3 + WAV</div>
+            </div>
+            <div>
+              <span class="spc-price" id="p-s1">SGD 6.90</span>
+              <input class="price-input" id="pi-s1" type="number" step="0.01" value="6.90" min="0">
+            </div>
+          </div>
+          <div class="spc-item">
+            <div>
+              <div class="spc-name">Soundbite Bundle</div>
+              <div class="spc-sub">5 tracks · Save 28%</div>
+            </div>
+            <div>
+              <span class="spc-price" id="p-s2">SGD 24.90</span>
+              <input class="price-input" id="pi-s2" type="number" step="0.01" value="24.90" min="0">
+            </div>
+          </div>
+          <div class="spc-item">
+            <div>
+              <div class="spc-name">Custom Voice Recording</div>
+              <div class="spc-sub">Personalised · One-off</div>
+            </div>
+            <div>
+              <span class="spc-price" id="p-s3">SGD 18.90</span>
+              <input class="price-input" id="pi-s3" type="number" step="0.01" value="18.90" min="0">
+            </div>
+          </div>
+        </div>
+
+        <!-- Images -->
+        <div class="shop-price-card">
+          <div class="spc-category">Images</div>
+          <div class="spc-item">
+            <div>
+              <div class="spc-name">Single Image</div>
+              <div class="spc-sub">4K · Instant download</div>
+            </div>
+            <div>
+              <span class="spc-price" id="p-i1">SGD 4.90</span>
+              <input class="price-input" id="pi-i1" type="number" step="0.01" value="4.90" min="0">
+            </div>
+          </div>
+          <div class="spc-item">
+            <div>
+              <div class="spc-name">Image Bundle</div>
+              <div class="spc-sub">5 images · Save 23%</div>
+            </div>
+            <div>
+              <span class="spc-price" id="p-i2">SGD 18.90</span>
+              <input class="price-input" id="pi-i2" type="number" step="0.01" value="18.90" min="0">
+            </div>
+          </div>
+          <div class="spc-item">
+            <div>
+              <div class="spc-name">Custom Image</div>
+              <div class="spc-sub">Bespoke · High resolution</div>
+            </div>
+            <div>
+              <span class="spc-price" id="p-i3">SGD 14.90</span>
+              <input class="price-input" id="pi-i3" type="number" step="0.01" value="14.90" min="0">
+            </div>
+          </div>
+        </div>
+
+        <!-- Videos -->
+        <div class="shop-price-card">
+          <div class="spc-category">Videos</div>
+          <div class="spc-item">
+            <div>
+              <div class="spc-name">Single Video</div>
+              <div class="spc-sub">3–8 min · HD download</div>
+            </div>
+            <div>
+              <span class="spc-price" id="p-v1">SGD 12.90</span>
+              <input class="price-input" id="pi-v1" type="number" step="0.01" value="12.90" min="0">
+            </div>
+          </div>
+          <div class="spc-item">
+            <div>
+              <div class="spc-name">Video Bundle</div>
+              <div class="spc-sub">3 videos · Save 23%</div>
+            </div>
+            <div>
+              <span class="spc-price" id="p-v2">SGD 29.90</span>
+              <input class="price-input" id="pi-v2" type="number" step="0.01" value="29.90" min="0">
+            </div>
+          </div>
+          <div class="spc-item">
+            <div>
+              <div class="spc-name">Custom Video</div>
+              <div class="spc-sub">Up to 8 min · Bespoke</div>
+            </div>
+            <div>
+              <span class="spc-price" id="p-v3">SGD 34.90</span>
+              <input class="price-input" id="pi-v3" type="number" step="0.01" value="34.90" min="0">
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="modal-note">
+        All purchases are instant digital downloads. Custom orders are delivered to your inbox within the timeframe of your chosen plan. Prices shown in Singapore Dollars (SGD). All sales are final on digital goods.
+      </div>
+
+    </div>
+    <div class="edit-save-bar" id="shopSaveBar">
+      <p>Editing mode — changes apply to displayed prices only. Connect a backend to persist.</p>
+      <button class="btn-save-prices" onclick="savePrices('shop')">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================
+     SUBSCRIPTION MODAL
+============================================ -->
+<div class="modal-backdrop" id="subsModal">
+  <div class="modal" id="subsModalInner">
+    <div class="modal-header">
+      <div class="modal-header-left">
+        <div class="modal-eyebrow">Subscription Plans</div>
+        <h2 class="modal-title">Custom content, <em>delivered</em></h2>
+      </div>
+      <div class="modal-header-right">
+        <button class="btn-edit-toggle" id="subsEditBtn" onclick="toggleEdit('subs')">
+          <svg viewBox="0 0 12 12" fill="none"><path d="M8.5 1.5L10.5 3.5L4 10H2V8L8.5 1.5Z"/><path d="M7 3L9 5"/></svg>
+          Edit Plans
+        </button>
+        <button class="btn-modal-close" onclick="closeModal('subsModal')">
+          <svg viewBox="0 0 12 12" fill="none"><path d="M2 2L10 10M10 2L2 10" stroke-width="1.5"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="modal-body" id="subsModalBody">
+
+      <div class="modal-plans">
+
+        <!-- Whisper -->
+        <div class="modal-plan">
+          <div class="modal-plan-name" id="pn-w">Whisper</div>
+          <input class="plan-name-input" id="pni-w" type="text" value="Whisper">
+          <div class="modal-plan-tagline">For those beginning their stillness practice</div>
+          <div class="plan-price-display" id="ppd-w">
+            <span class="currency">SGD</span>
+            <span class="amount" id="pa-w">19</span>
+            <span class="cents" id="pc-w">.90</span>
+          </div>
+          <div class="plan-price-input" id="ppi-w">
+            <span class="currency-label">SGD</span>
+            <input class="plan-price-edit" id="ppe-w" type="number" step="0.10" value="19.90" min="0">
+          </div>
+          <div class="plan-period-label">per month · cancel anytime</div>
+          <div class="modal-plan-divider"></div>
+          <ul class="modal-plan-features">
+            <li>2 custom soundbites per month</li>
+            <li>Personalised to your name &amp; mood</li>
+            <li>Standard 3–5 min duration</li>
+            <li>Delivered within 5 business days</li>
+            <li>MP3 + WAV formats included</li>
+            <li class="dim">Video content</li>
+            <li class="dim">Image delivery</li>
+          </ul>
+          <button class="modal-plan-cta cta-ghost">Choose Whisper</button>
+        </div>
+
+        <!-- Serenity -->
+        <div class="modal-plan featured">
+          <div class="modal-plan-badge">Most Popular</div>
+          <div class="modal-plan-name" id="pn-s">Serenity</div>
+          <input class="plan-name-input" id="pni-s" type="text" value="Serenity">
+          <div class="modal-plan-tagline">The complete sensory experience</div>
+          <div class="plan-price-display" id="ppd-s">
+            <span class="currency">SGD</span>
+            <span class="amount" id="pa-s">39</span>
+            <span class="cents" id="pc-s">.90</span>
+          </div>
+          <div class="plan-price-input" id="ppi-s">
+            <span class="currency-label">SGD</span>
+            <input class="plan-price-edit" id="ppe-s" type="number" step="0.10" value="39.90" min="0">
+          </div>
+          <div class="plan-period-label">per month · cancel anytime</div>
+          <div class="modal-plan-divider"></div>
+          <ul class="modal-plan-features">
+            <li>2 custom soundbites per month</li>
+            <li>1 bespoke sensory image</li>
+            <li>1 custom ambient video (5 min)</li>
+            <li>Personalised to your preferences</li>
+            <li>Delivered within 4 business days</li>
+            <li>All formats included</li>
+            <li>Monthly mood questionnaire</li>
+          </ul>
+          <button class="modal-plan-cta cta-solid">Choose Serenity</button>
+        </div>
+
+        <!-- Sanctuary -->
+        <div class="modal-plan">
+          <div class="modal-plan-name" id="pn-sa">Sanctuary</div>
+          <input class="plan-name-input" id="pni-sa" type="text" value="Sanctuary">
+          <div class="modal-plan-tagline">Unlimited. Unhurried. Entirely yours.</div>
+          <div class="plan-price-display" id="ppd-sa">
+            <span class="currency">SGD</span>
+            <span class="amount" id="pa-sa">79</span>
+            <span class="cents" id="pc-sa">.90</span>
+          </div>
+          <div class="plan-price-input" id="ppi-sa">
+            <span class="currency-label">SGD</span>
+            <input class="plan-price-edit" id="ppe-sa" type="number" step="0.10" value="79.90" min="0">
+          </div>
+          <div class="plan-period-label">per month · cancel anytime</div>
+          <div class="modal-plan-divider"></div>
+          <ul class="modal-plan-features">
+            <li>Unlimited custom requests</li>
+            <li>Soundbites, images &amp; videos</li>
+            <li>Priority 48-hour creation</li>
+            <li>Dedicated creation profile</li>
+            <li>Extended durations (up to 20 min)</li>
+            <li>Exclusive content not sold in shop</li>
+            <li>Monthly 1-on-1 brief call</li>
+          </ul>
+          <button class="modal-plan-cta cta-ghost">Choose Sanctuary</button>
+        </div>
+
+      </div>
+
+      <div class="modal-note">
+        All plans renew monthly. Cancel or pause at any time from your account dashboard. Custom content is created exclusively for you — your files are never resold. Delivery times are business days from request receipt. Welcome to Sondrift.
+      </div>
+
+    </div>
+    <div class="edit-save-bar" id="subsSaveBar">
+      <p>Editing mode — changes apply live to this modal.</p>
+      <button class="btn-save-prices" onclick="savePrices('subs')">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    cursor.style.left = mx + 'px';
+    cursor.style.top = my + 'px';
+  });
+
+  function animRing() {
+    rx += (mx - rx) * 0.12;
+    ry += (my - ry) * 0.12;
+    ring.style.left = rx + 'px';
+    ring.style.top = ry + 'px';
+    requestAnimationFrame(animRing);
+  }
+  animRing();
+
+  document.querySelectorAll('a, button, select, input').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      cursor.style.width = '16px';
+      cursor.style.height = '16px';
+      cursor.style.background = '#fff';
+      ring.style.width = '50px';
+      ring.style.height = '50px';
+    });
+    el.addEventListener('mouseleave', () => {
+      cursor.style.width = '8px';
+      cursor.style.height = '8px';
+      cursor.style.background = 'var(--white)';
+      ring.style.width = '36px';
+      ring.style.height = '36px';
+    });
+  });
+
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 60);
+  });
+
+  function switchTab(e, id) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    e.target.classList.add('active');
+    document.getElementById(id).classList.add('active');
+  }
+
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) e.target.classList.add('visible');
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+  // ============================================
+  // SUBSCRIPTION PLAN EDITOR
+  // ============================================
+  const planIds = ['w', 's', 'sa'];
+
+  // Store features in memory per plan
+  const planFeatures = {
+    w:  [
+      { text: '2 custom soundbites per month', dim: false },
+      { text: 'Personalised to your name & mood', dim: false },
+      { text: 'Standard 3–5 min duration', dim: false },
+      { text: 'Delivered within 5 business days', dim: false },
+      { text: 'MP3 + WAV formats included', dim: false },
+      { text: 'Video content', dim: true },
+      { text: 'Image delivery', dim: true },
+      { text: 'Priority creation', dim: true }
+    ],
+    s:  [
+      { text: '2 custom soundbites per month', dim: false },
+      { text: '1 bespoke sensory image', dim: false },
+      { text: '1 custom ambient video (5 min)', dim: false },
+      { text: 'Personalised to your preferences', dim: false },
+      { text: 'Delivered within 4 business days', dim: false },
+      { text: 'All formats included', dim: false },
+      { text: 'Monthly mood questionnaire', dim: false },
+      { text: 'Priority creation', dim: true }
+    ],
+    sa: [
+      { text: 'Unlimited custom requests', dim: false },
+      { text: 'Soundbites, images & videos', dim: false },
+      { text: 'Priority 48-hour creation', dim: false },
+      { text: 'Dedicated creation profile', dim: false },
+      { text: 'Extended durations (up to 20 min)', dim: false },
+      { text: 'Exclusive content not sold in shop', dim: false },
+      { text: 'Monthly 1-on-1 brief call', dim: false },
+      { text: 'Gift subscription option', dim: false }
+    ]
+  };
+
+  function buildFeatureEditor(pid) {
+    const wrap = document.getElementById('pfedit-' + pid);
+    const features = planFeatures[pid];
+    wrap.innerHTML = '';
+
+    features.forEach((feat, idx) => {
+      const row = document.createElement('div');
+      row.className = 'feature-edit-row';
+
+      const inp = document.createElement('input');
+      inp.type = 'text';
+      inp.className = 'feature-edit-input' + (feat.dim ? ' dim-feature' : '');
+      inp.value = feat.text;
+      inp.maxLength = 60;
+      inp.addEventListener('input', () => { features[idx].text = inp.value; });
+      inp.addEventListener('keydown', e => { if (e.key === 'Enter') inp.blur(); });
+
+      // Dim toggle (eye icon — shows whether feature is "greyed out" = not included)
+      const dimBtn = document.createElement('button');
+      dimBtn.className = 'feature-dim-toggle' + (feat.dim ? '' : ' is-dim');
+      dimBtn.title = feat.dim ? 'Mark as included' : 'Mark as not included';
+      dimBtn.innerHTML = feat.dim ? '○' : '●';
+      dimBtn.addEventListener('click', () => {
+        features[idx].dim = !features[idx].dim;
+        inp.classList.toggle('dim-feature', features[idx].dim);
+        dimBtn.className = 'feature-dim-toggle' + (features[idx].dim ? '' : ' is-dim');
+        dimBtn.innerHTML = features[idx].dim ? '○' : '●';
+        dimBtn.title = features[idx].dim ? 'Mark as included' : 'Mark as not included';
+      });
+
+      const delBtn = document.createElement('button');
+      delBtn.className = 'feature-del-btn';
+      delBtn.innerHTML = '×';
+      delBtn.title = 'Remove feature';
+      delBtn.addEventListener('click', () => {
+        features.splice(idx, 1);
+        buildFeatureEditor(pid);
+      });
+
+      row.appendChild(inp);
+      row.appendChild(dimBtn);
+      row.appendChild(delBtn);
+      wrap.appendChild(row);
+    });
+
+    // Add new feature row
+    const addRow = document.createElement('div');
+    addRow.className = 'add-feature-row';
+    const addInp = document.createElement('input');
+    addInp.type = 'text';
+    addInp.className = 'add-feature-input';
+    addInp.placeholder = 'Add a feature…';
+    addInp.maxLength = 60;
+    const addBtn = document.createElement('button');
+    addBtn.className = 'add-feature-btn';
+    addBtn.textContent = '+ Add';
+    const doAdd = () => {
+      const val = addInp.value.trim();
+      if (!val) return;
+      features.push({ text: val, dim: false });
+      addInp.value = '';
+      buildFeatureEditor(pid);
+    };
+    addBtn.addEventListener('click', doAdd);
+    addInp.addEventListener('keydown', e => { if (e.key === 'Enter') doAdd(); });
+    addRow.appendChild(addInp);
+    addRow.appendChild(addBtn);
+    wrap.appendChild(addRow);
+  }
+
+  function applyPlanFeatures(pid) {
+    const ul = document.getElementById('pfeatures-' + pid);
+    ul.innerHTML = '';
+    planFeatures[pid].forEach(feat => {
+      const li = document.createElement('li');
+      if (feat.dim) li.className = 'dim';
+      li.textContent = feat.text;
+      ul.appendChild(li);
+    });
+  }
+
+  function applyPlanPrice(pid) {
+    const inp = document.getElementById('pprice-inp-' + pid);
+    const disp = document.getElementById('pprice-' + pid);
+    const val = parseFloat(inp.value) || 0;
+    const whole = Math.floor(val);
+    const cents = '.' + String(Math.round((val - whole) * 100)).padStart(2, '0');
+    disp.innerHTML = `<sup>SGD </sup>${whole}<sup>${cents}</sup>`;
+  }
+
+  function togglePlanEdit(pid) {
+    const card = document.getElementById('pc-' + pid);
+    const btn  = document.getElementById('peb-' + pid);
+    const isEditing = card.classList.contains('plan-editing');
+    if (isEditing) {
+      savePlanEdit(pid);
+    } else {
+      // Close any other open plan editors
+      planIds.forEach(id => {
+        if (id !== pid && document.getElementById('pc-' + id).classList.contains('plan-editing')) {
+          savePlanEdit(id);
+        }
+      });
+      openPlanEdit(pid);
+    }
+  }
+
+  function openPlanEdit(pid) {
+    const card = document.getElementById('pc-' + pid);
+    const btn  = document.getElementById('peb-' + pid);
+    const nameInp    = document.getElementById('pname-inp-' + pid);
+    const tagInp     = document.getElementById('ptagline-inp-' + pid);
+    const nameDisp   = document.getElementById('pname-' + pid);
+    const tagDisp    = document.getElementById('ptagline-' + pid);
+
+    // Sync values
+    nameInp.value = nameDisp.textContent.trim();
+    tagInp.value  = tagDisp.textContent.trim();
+
+    card.classList.add('plan-editing');
+    btn.classList.add('active');
+    btn.title = 'Save changes';
+    btn.innerHTML = '<svg viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="currentColor" stroke-width="1.5"/></svg>';
+
+    buildFeatureEditor(pid);
+    nameInp.focus();
+    nameInp.select();
+
+    nameInp.onkeydown = e => {
+      if (e.key === 'Enter') { e.preventDefault(); tagInp.focus(); }
+      if (e.key === 'Escape') savePlanEdit(pid);
+    };
+    tagInp.onkeydown = e => {
+      if (e.key === 'Enter') { e.preventDefault(); document.getElementById('pprice-inp-' + pid).focus(); }
+      if (e.key === 'Escape') savePlanEdit(pid);
+    };
+
+    // Live price preview
+    const priceInp = document.getElementById('pprice-inp-' + pid);
+    priceInp.oninput = () => applyPlanPrice(pid);
+    priceInp.onkeydown = e => { if (e.key === 'Escape') savePlanEdit(pid); };
+  }
+
+  function savePlanEdit(pid) {
+    const card    = document.getElementById('pc-' + pid);
+    const btn     = document.getElementById('peb-' + pid);
+    const nameInp = document.getElementById('pname-inp-' + pid);
+    const tagInp  = document.getElementById('ptagline-inp-' + pid);
+    const nameDisp= document.getElementById('pname-' + pid);
+    const tagDisp = document.getElementById('ptagline-' + pid);
+    const flash   = document.getElementById('psaved-' + pid);
+    const planBtn = document.getElementById('pbtn-' + pid);
+
+    // Apply name
+    const newName = nameInp.value.trim();
+    if (newName) {
+      nameDisp.textContent = newName;
+      // Update CTA button text
+      if (planBtn) planBtn.textContent = 'Choose ' + newName;
+    }
+    // Apply tagline
+    const newTag = tagInp.value.trim();
+    if (newTag) tagDisp.textContent = newTag;
+
+    // Apply price
+    applyPlanPrice(pid);
+
+    // Apply features
+    applyPlanFeatures(pid);
+
+    // Exit edit mode
+    card.classList.remove('plan-editing');
+    btn.classList.remove('active');
+    btn.title = 'Edit plan';
+    btn.innerHTML = '<svg viewBox="0 0 12 12"><path d="M7.5 1.5L10.5 4.5L4 11H1V8L7.5 1.5Z" stroke-width="1.2"/><path d="M6 3L9 6" stroke-width="1.2"/></svg>';
+
+    // Flash saved
+    flash.classList.add('show');
+    setTimeout(() => flash.classList.remove('show'), 1800);
+  }
+
+  // Click outside a plan card in edit mode → save
+  document.addEventListener('click', e => {
+    planIds.forEach(pid => {
+      const card = document.getElementById('pc-' + pid);
+      if (card && card.classList.contains('plan-editing') && !card.contains(e.target)) {
+        savePlanEdit(pid);
+      }
+    });
+  });
+
+  // ============================================
+  const soundCards = ['sc1','sc2','sc3'];
+  const cardNums   = ['1','2','3'];
+
+  function toggleCardEdit(cardId) {
+    const card = document.getElementById(cardId);
+    const isEditing = card.classList.contains('card-editing');
+    if (isEditing) {
+      saveCardEdit(cardId);
+    } else {
+      // Close any other open cards first
+      soundCards.forEach(id => {
+        if (id !== cardId && document.getElementById(id).classList.contains('card-editing')) {
+          saveCardEdit(id);
+        }
+      });
+      openCardEdit(cardId);
+    }
+  }
+
+  function openCardEdit(cardId) {
+    const num = cardId.replace('sc','');
+    const card = document.getElementById(cardId);
+    const nameInput = document.getElementById('sni' + num);
+    const descInput = document.getElementById('sdi' + num);
+    const nameDisp  = document.getElementById('sn' + num);
+    const descDisp  = document.getElementById('sd' + num);
+    const editBtn   = document.getElementById('ecb' + num);
+
+    // Sync input values from current display text
+    nameInput.value = nameDisp.textContent;
+    descInput.value = descDisp.textContent;
+
+    card.classList.add('card-editing');
+    editBtn.classList.add('active');
+    editBtn.title = 'Save changes';
+    // Update pencil icon to checkmark
+    editBtn.innerHTML = '<svg viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="currentColor" stroke-width="1.5"/></svg>';
+
+    // Auto-resize textarea
+    autoResizeTextarea(descInput);
+    nameInput.focus();
+    nameInput.select();
+
+    // Enter on name jumps to description
+    nameInput.onkeydown = function(e) {
+      if (e.key === 'Enter') { e.preventDefault(); descInput.focus(); }
+      if (e.key === 'Escape') saveCardEdit(cardId);
+    };
+    descInput.onkeydown = function(e) {
+      if (e.key === 'Escape') saveCardEdit(cardId);
+      if (e.key === 'Enter' && e.ctrlKey) { e.preventDefault(); saveCardEdit(cardId); }
+    };
+    descInput.oninput = function() { autoResizeTextarea(this); };
+  }
+
+  function saveCardEdit(cardId) {
+    const num = cardId.replace('sc','');
+    const card      = document.getElementById(cardId);
+    const nameInput = document.getElementById('sni' + num);
+    const descInput = document.getElementById('sdi' + num);
+    const nameDisp  = document.getElementById('sn' + num);
+    const descDisp  = document.getElementById('sd' + num);
+    const editBtn   = document.getElementById('ecb' + num);
+    const flash     = document.getElementById('sf' + num);
+
+    // Apply values (fallback to previous if empty)
+    const newName = nameInput.value.trim();
+    const newDesc = descInput.value.trim();
+    if (newName) nameDisp.textContent = newName;
+    if (newDesc) descDisp.textContent = newDesc;
+    nameInput.value = nameDisp.textContent;
+    descInput.value = descDisp.textContent;
+
+    // Exit edit mode
+    card.classList.remove('card-editing');
+    editBtn.classList.remove('active');
+    editBtn.title = 'Edit name & description';
+    editBtn.innerHTML = '<svg viewBox="0 0 12 12" fill="none"><path d="M7.5 1.5L10.5 4.5L4 11H1V8L7.5 1.5Z" stroke-width="1.2"/><path d="M6 3L9 6" stroke-width="1.2"/></svg>';
+
+    // Flash "Saved" confirmation
+    flash.classList.add('show');
+    setTimeout(() => flash.classList.remove('show'), 1800);
+  }
+
+  function autoResizeTextarea(el) {
+    el.style.height = 'auto';
+    el.style.height = el.scrollHeight + 'px';
+  }
+
+  // Click outside any editing card → save it
+  document.addEventListener('click', function(e) {
+    soundCards.forEach(cardId => {
+      const card = document.getElementById(cardId);
+      if (card && card.classList.contains('card-editing') && !card.contains(e.target)) {
+        saveCardEdit(cardId);
+      }
+    });
+  });
+
+  // ============================================
+  function openModal(id) {
+    const m = document.getElementById(id);
+    m.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeModal(id) {
+    const m = document.getElementById(id);
+    m.classList.remove('open');
+    document.body.style.overflow = '';
+    // If editing, turn it off on close
+    const prefix = id === 'shopModal' ? 'shop' : 'subs';
+    const body = document.getElementById(prefix + 'ModalBody');
+    if (body && body.classList.contains('editing-mode')) {
+      body.classList.remove('editing-mode');
+      document.getElementById(prefix + 'EditBtn').classList.remove('editing');
+      document.getElementById(prefix + 'SaveBar').classList.remove('visible');
+    }
+  }
+  // Close on backdrop click
+  document.addEventListener('click', function(e) {
+    ['shopModal','subsModal'].forEach(id => {
+      const m = document.getElementById(id);
+      if (e.target === m) closeModal(id);
+    });
+  });
+  // Close on Escape
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      ['shopModal','subsModal'].forEach(id => {
+        if (document.getElementById(id).classList.contains('open')) closeModal(id);
+      });
+    }
+  });
+
+  // ── EDIT MODE ──
+  function toggleEdit(prefix) {
+    const body    = document.getElementById(prefix + 'ModalBody');
+    const btn     = document.getElementById(prefix + 'EditBtn');
+    const saveBar = document.getElementById(prefix + 'SaveBar');
+    const isEditing = body.classList.toggle('editing-mode');
+    btn.classList.toggle('editing', isEditing);
+    saveBar.classList.toggle('visible', isEditing);
+    btn.querySelector('svg + *') || null;
+    // Update button label
+    const textNode = [...btn.childNodes].find(n => n.nodeType === 3);
+    if (textNode) textNode.textContent = isEditing ? ' Done Editing' : ' Edit Prices';
+    if (isEditing) {
+      btn.innerHTML = btn.innerHTML.replace('Edit Prices','Done Editing').replace('Edit Plans','Done Editing');
+    } else {
+      btn.innerHTML = btn.innerHTML.replace('Done Editing','Edit Prices').replace('Done Editing','Edit Plans');
+      // When leaving edit mode, also save
+      if (prefix === 'shop') applyShopPrices();
+      if (prefix === 'subs') applySubsPrices();
+    }
+  }
+
+  function fmt(val) {
+    const n = parseFloat(val);
+    if (isNaN(n)) return 'SGD 0.00';
+    return 'SGD ' + n.toFixed(2);
+  }
+
+  function applyShopPrices() {
+    const ids = ['s1','s2','s3','i1','i2','i3','v1','v2','v3'];
+    ids.forEach(id => {
+      const inp = document.getElementById('pi-' + id);
+      const disp = document.getElementById('p-' + id);
+      if (inp && disp) disp.textContent = fmt(inp.value);
+    });
+  }
+
+  function applySubsPrices() {
+    ['w','s','sa'].forEach(id => {
+      const inp = document.getElementById('ppe-' + id);
+      if (!inp) return;
+      const val = parseFloat(inp.value) || 0;
+      const whole = Math.floor(val);
+      const cents = '.' + String(Math.round((val - whole) * 100)).padStart(2,'0');
+      const amountEl = document.getElementById('pa-' + id);
+      const centsEl  = document.getElementById('pc-' + id);
+      if (amountEl) amountEl.textContent = whole;
+      if (centsEl)  centsEl.textContent  = cents;
+      // Also update plan name
+      const nameInp = document.getElementById('pni-' + id);
+      const nameDisp = document.getElementById('pn-' + id);
+      if (nameInp && nameDisp) nameDisp.textContent = nameInp.value || nameDisp.textContent;
+    });
+  }
+
+  function savePrices(prefix) {
+    if (prefix === 'shop') applyShopPrices();
+    if (prefix === 'subs') applySubsPrices();
+    // Flash save confirmation
+    const bar = document.getElementById(prefix + 'SaveBar');
+    const btn = bar.querySelector('.btn-save-prices');
+    const orig = btn.textContent;
+    btn.textContent = 'Saved ✓';
+    btn.style.background = 'var(--accent-dim)';
+    setTimeout(() => {
+      btn.textContent = orig;
+      btn.style.background = '';
+    }, 1800);
+    // Turn off edit mode after save
+    const body = document.getElementById(prefix + 'ModalBody');
+    const editBtn = document.getElementById(prefix + 'EditBtn');
+    body.classList.remove('editing-mode');
+    editBtn.classList.remove('editing');
+    bar.classList.remove('visible');
+    editBtn.innerHTML = editBtn.innerHTML.replace('Done Editing', prefix === 'shop' ? 'Edit Prices' : 'Edit Plans');
+  }
+
+  // Live preview as user types in subs plan price
+  ['w','s','sa'].forEach(id => {
+    const inp = document.getElementById('ppe-' + id);
+    if (!inp) return;
+    inp.addEventListener('input', () => {
+      const val = parseFloat(inp.value) || 0;
+      const whole = Math.floor(val);
+      const cents = '.' + String(Math.round((val - whole)*100)).padStart(2,'0');
+      const a = document.getElementById('pa-' + id);
+      const c = document.getElementById('pc-' + id);
+      // Only update when in editing mode
+      const body = document.getElementById('subsModalBody');
+      if (body && body.classList.contains('editing-mode')) {
+        if (a) a.textContent = whole;
+        if (c) c.textContent = cents;
+      }
+    });
+  });
+
+  // ============================================
+
+  // Shared audio instances
+  const audioInstances = {};
+
+  function fmtTime(s) {
+    if (isNaN(s)) return '0:00';
+    const m = Math.floor(s / 60);
+    const sec = Math.floor(s % 60);
+    return m + ':' + (sec < 10 ? '0' : '') + sec;
+  }
+
+  function buildWaveform(containerId, bars = 32) {
+    const wrap = document.getElementById(containerId);
+    if (!wrap) return;
+    wrap.innerHTML = '';
+    for (let i = 0; i < bars; i++) {
+      const b = document.createElement('div');
+      b.className = 'audio-bar';
+      const h = 4 + Math.random() * 28;
+      b.style.height = h + 'px';
+      wrap.appendChild(b);
+    }
+  }
+
+  function updateWaveform(containerId, progress) {
+    const wrap = document.getElementById(containerId);
+    if (!wrap) return;
+    const bars = wrap.querySelectorAll('.audio-bar');
+    const activeCount = Math.floor(progress * bars.length);
+    bars.forEach((b, i) => b.classList.toggle('active', i < activeCount));
+  }
+
+  function loadAudio(id, input) {
+    const file = input.files[0];
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+
+    // Stop any playing audio
+    if (audioInstances[id]) {
+      audioInstances[id].pause();
+      URL.revokeObjectURL(audioInstances[id].src);
+    }
+
+    const audio = new Audio(url);
+    audioInstances[id] = audio;
+
+    const player   = document.getElementById('ap' + id);
+    const filename = document.getElementById('af' + id);
+    const playBtn  = document.getElementById('apb' + id);
+    const progWrap = document.getElementById('apr' + id);
+    const progFill = document.getElementById('apf' + id);
+    const progThumb= document.getElementById('apt' + id);
+    const timeEl   = document.getElementById('at' + id);
+    const removeBtn= document.getElementById('arm' + id);
+    const zone     = document.getElementById('muz' + id);
+
+    // Show name
+    const name = file.name.length > 26 ? file.name.substring(0,24) + '…' : file.name;
+    filename.textContent = name;
+
+    // Build waveform
+    buildWaveform('aw' + id);
+
+    // Show player
+    player.classList.add('active');
+    zone.classList.add('has-media');
+
+    // Play/pause toggle
+    let playing = false;
+    playBtn.onclick = function() {
+      if (playing) {
+        audio.pause();
+      } else {
+        // Pause all other audio
+        Object.entries(audioInstances).forEach(([k,a]) => {
+          if (k !== id) { a.pause(); updatePlayBtn(k, false); }
+        });
+        audio.play();
+      }
+    };
+
+    function updatePlayBtn(pid, isPlaying) {
+      const btn = document.getElementById('apb' + pid);
+      if (!btn) return;
+      btn.innerHTML = isPlaying
+        ? '<svg viewBox="0 0 12 12"><rect x="2" y="2" width="3" height="8" fill="currentColor"/><rect x="7" y="2" width="3" height="8" fill="currentColor"/></svg>'
+        : '<svg viewBox="0 0 12 12"><path d="M3 2L10 6L3 10Z" fill="currentColor"/></svg>';
+    }
+
+    audio.addEventListener('play',  () => { playing = true;  updatePlayBtn(id, true); });
+    audio.addEventListener('pause', () => { playing = false; updatePlayBtn(id, false); });
+    audio.addEventListener('ended', () => { playing = false; updatePlayBtn(id, false); updateWaveform('aw'+id, 0); });
+
+    audio.addEventListener('loadedmetadata', () => {
+      timeEl.textContent = '0:00 / ' + fmtTime(audio.duration);
+    });
+
+    audio.addEventListener('timeupdate', () => {
+      if (!audio.duration) return;
+      const pct = (audio.currentTime / audio.duration) * 100;
+      progFill.style.width = pct + '%';
+      progThumb.style.left = pct + '%';
+      timeEl.textContent = fmtTime(audio.currentTime) + ' / ' + fmtTime(audio.duration);
+      updateWaveform('aw' + id, audio.currentTime / audio.duration);
+    });
+
+    // Seek
+    progWrap.addEventListener('click', function(e) {
+      if (!audio.duration) return;
+      const rect = this.getBoundingClientRect();
+      const pct = (e.clientX - rect.left) / rect.width;
+      audio.currentTime = pct * audio.duration;
+    });
+
+    // Remove
+    removeBtn.onclick = function() {
+      audio.pause();
+      player.classList.remove('active');
+      zone.classList.remove('has-media');
+      progFill.style.width = '0%';
+      progThumb.style.left = '0%';
+      timeEl.textContent = '0:00 / 0:00';
+      updatePlayBtn(id, false);
+      input.value = '';
+      delete audioInstances[id];
+    };
+  }
+
+  // ── VIDEO PLAYERS ──
+  const videoInstances = {};
+
+  function loadVideo(id, input) {
+    const file = input.files[0];
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+
+    if (videoInstances[id]) {
+      videoInstances[id].pause();
+      URL.revokeObjectURL(videoInstances[id].src);
+    }
+
+    const vid     = document.getElementById('vel' + id);
+    const player  = document.getElementById('vp' + id);
+    const playBtn = document.getElementById('vpb' + id);
+    const progWrap= document.getElementById('vpr' + id);
+    const progFill= document.getElementById('vpf' + id);
+    const timeEl  = document.getElementById('vt' + id);
+    const volBtn  = document.getElementById('vvb' + id);
+    const rmBtn   = document.getElementById('vrm' + id);
+    const zone    = document.getElementById('vuz' + id);
+
+    vid.src = url;
+    videoInstances[id] = vid;
+
+    player.classList.add('active');
+    zone.classList.add('has-media');
+
+    let muted = false;
+
+    function updateVPlayBtn(isPlaying) {
+      playBtn.innerHTML = isPlaying
+        ? '<svg viewBox="0 0 10 10"><rect x="1" y="1" width="3" height="8" fill="currentColor"/><rect x="6" y="1" width="3" height="8" fill="currentColor"/></svg>'
+        : '<svg viewBox="0 0 10 10"><path d="M2 1.5L8.5 5L2 8.5Z" fill="currentColor"/></svg>';
+    }
+
+    playBtn.onclick = function() {
+      if (!vid.paused) {
+        vid.pause();
+      } else {
+        // Pause all other videos
+        Object.entries(videoInstances).forEach(([k,v]) => {
+          if (k !== id && !v.paused) { v.pause(); updateVPlayBtnById(k, false); }
+        });
+        // Pause all audio too
+        Object.values(audioInstances).forEach(a => a.pause());
+        vid.play();
+      }
+    };
+
+    function updateVPlayBtnById(pid, isPlaying) {
+      const btn = document.getElementById('vpb' + pid);
+      if (!btn) return;
+      btn.innerHTML = isPlaying
+        ? '<svg viewBox="0 0 10 10"><rect x="1" y="1" width="3" height="8" fill="currentColor"/><rect x="6" y="1" width="3" height="8" fill="currentColor"/></svg>'
+        : '<svg viewBox="0 0 10 10"><path d="M2 1.5L8.5 5L2 8.5Z" fill="currentColor"/></svg>';
+    }
+
+    vid.addEventListener('play',  () => updateVPlayBtn(true));
+    vid.addEventListener('pause', () => updateVPlayBtn(false));
+    vid.addEventListener('ended', () => { updateVPlayBtn(false); progFill.style.width = '0%'; });
+
+    vid.addEventListener('loadedmetadata', () => {
+      timeEl.textContent = '0:00 / ' + fmtTime(vid.duration);
+    });
+
+    vid.addEventListener('timeupdate', () => {
+      if (!vid.duration) return;
+      const pct = (vid.currentTime / vid.duration) * 100;
+      progFill.style.width = pct + '%';
+      timeEl.textContent = fmtTime(vid.currentTime) + ' / ' + fmtTime(vid.duration);
+    });
+
+    progWrap.addEventListener('click', function(e) {
+      if (!vid.duration) return;
+      const rect = this.getBoundingClientRect();
+      vid.currentTime = ((e.clientX - rect.left) / rect.width) * vid.duration;
+    });
+
+    volBtn.onclick = function() {
+      muted = !muted;
+      vid.muted = muted;
+      volBtn.style.opacity = muted ? '0.35' : '1';
+    };
+
+    rmBtn.onclick = function() {
+      vid.pause();
+      vid.src = '';
+      player.classList.remove('active');
+      zone.classList.remove('has-media');
+      progFill.style.width = '0%';
+      timeEl.textContent = '0:00 / 0:00';
+      updateVPlayBtn(false);
+      input.value = '';
+      delete videoInstances[id];
+    };
+  }
+  const bgImg      = document.getElementById('heroBgImg');
+  const bgBase     = document.getElementById('heroBg');
+  const bgLines    = document.getElementById('heroLines');
+  const overlay    = document.getElementById('heroOverlay');
+  const fileInput  = document.getElementById('bgFileInput');
+  const slider     = document.getElementById('overlaySlider');
+  const overlayVal = document.getElementById('overlayVal');
+  const controls   = document.getElementById('overlayControls');
+  const removBtn   = document.getElementById('removeBgBtn');
+  const posSelect  = document.getElementById('posSelect');
+  const hint       = document.getElementById('bgHint');
+  const uploadBtn  = document.getElementById('bgUploadBtn');
+
+  let hasImage = false;
+
+  function setOverlay(val) {
+    const alpha = (val / 100).toFixed(2);
+    const alphaLight = (val / 100 * 0.7).toFixed(2);
+    overlay.style.background = `linear-gradient(
+      to bottom,
+      rgba(10,10,10,${(val/100*0.55).toFixed(2)}) 0%,
+      rgba(10,10,10,${alpha}) 40%,
+      rgba(10,10,10,${(val/100*0.75).toFixed(2)}) 100%
+    )`;
+    overlayVal.textContent = val + '%';
+  }
+
+  fileInput.addEventListener('change', function() {
+    const file = this.files[0];
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    bgImg.style.backgroundImage = `url('${url}')`;
+    bgImg.style.backgroundPosition = posSelect.value;
+    bgImg.classList.add('loaded');
+    bgBase.classList.add('hidden');
+    bgLines.classList.add('hidden');
+    controls.classList.add('visible');
+    hint.textContent = file.name.length > 22 ? file.name.substring(0,20)+'…' : file.name;
+    hint.style.color = 'var(--accent)';
+    hasImage = true;
+    setOverlay(parseInt(slider.value));
+  });
+
+  slider.addEventListener('input', function() {
+    setOverlay(parseInt(this.value));
+  });
+
+  posSelect.addEventListener('change', function() {
+    bgImg.style.backgroundPosition = this.value;
+  });
+
+  removBtn.addEventListener('click', function() {
+    bgImg.style.backgroundImage = '';
+    bgImg.classList.remove('loaded');
+    bgBase.classList.remove('hidden');
+    bgLines.classList.remove('hidden');
+    controls.classList.remove('visible');
+    overlay.style.background = '';
+    hint.textContent = 'Click to set hero background';
+    hint.style.color = '';
+    hasImage = false;
+    fileInput.value = '';
+    slider.value = 50;
+    overlayVal.textContent = '50%';
+  });
+
+  // Toggle controls panel on button click if image already set
+  uploadBtn.addEventListener('click', function(e) {
+    if (hasImage) {
+      e.preventDefault();
+      e.stopPropagation();
+      controls.classList.toggle('visible');
+    }
+  });
+</script>
+</body>
+</html>
