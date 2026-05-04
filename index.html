@@ -1386,8 +1386,40 @@
     .footer-grid { grid-template-columns: 1fr 1fr; }
     .hero { padding: 6rem 2rem; }
     .ambient-bar { padding: 1.2rem 2rem; gap: 1.5rem; }
+    .disclaimer-banner { padding: 0.85rem 2.5rem; }
+    .disclaimer-dismiss { right: 1rem; }
   }
-</style>
+
+  /* Disclaimer Banner */
+  .disclaimer-banner {
+    background: rgba(255,255,255,0.03);
+    border-top: 1px solid rgba(255,255,255,0.06);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    padding: 0.9rem 4rem;
+    display: flex; align-items: center; justify-content: center;
+    gap: 1rem; position: relative;
+  }
+  .disclaimer-icon {
+    width: 18px; height: 18px; flex-shrink: 0;
+    border: 1px solid var(--silver); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.7rem; color: var(--silver); font-style: italic;
+    font-family: var(--serif); line-height: 1;
+  }
+  .disclaimer-text {
+    font-size: 0.7rem; color: var(--light-mid);
+    letter-spacing: 0.03em; line-height: 1.5; text-align: center;
+  }
+  .disclaimer-text strong { color: var(--silver); font-weight: 400; }
+  .disclaimer-dismiss {
+    position: absolute; right: 2rem; top: 50%;
+    transform: translateY(-50%);
+    background: none; border: none; cursor: none;
+    color: var(--mid); font-size: 1.1rem; line-height: 1;
+    transition: color 0.2s; padding: 0.2rem;
+  }
+  .disclaimer-dismiss:hover { color: var(--silver); }
+  .disclaimer-banner.hidden { display: none; }
 </head>
 <body>
 
@@ -1483,6 +1515,18 @@
   <span class="ambient-item">Personal Delivery</span>
   <div class="ambient-dot"></div>
   <span class="ambient-item">Instant Downloads</span>
+</div>
+
+<!-- Disclaimer Banner -->
+<div class="disclaimer-banner" id="disclaimerBanner">
+  <div class="disclaimer-icon">i</div>
+  <p class="disclaimer-text">
+    <strong>Therapeutic Content Only.</strong>
+    Sondrift provides ASMR experiences intended solely for relaxation, mindfulness, and sensory wellness.
+    We do not produce or distribute inappropriate, explicit, or adult content of any kind.
+    All content is suitable for general audiences aged 13 and above.
+  </p>
+  <button class="disclaimer-dismiss" onclick="document.getElementById('disclaimerBanner').classList.add('hidden')" title="Dismiss">×</button>
 </div>
 
 <!-- About -->
@@ -2275,6 +2319,9 @@
   </div>
   <div class="footer-bottom">
     <p>© 2026 Sondrift Studio. All rights reserved.</p>
+    <p style="font-size:0.62rem;color:var(--mid);text-align:center;max-width:500px;line-height:1.6;margin:0.5rem auto 0">
+      Therapeutic content only. Sondrift does not produce or distribute explicit, inappropriate, or adult content of any kind.
+    </p>
     <p>
       <a href="#" onclick="openModal('privacyModal');return false" style="color:var(--mid);text-decoration:none;transition:color 0.2s" onmouseover="this.style.color='var(--silver)'" onmouseout="this.style.color='var(--mid)'">Privacy</a>
       &nbsp;·&nbsp;
@@ -3671,7 +3718,10 @@
       <p style="font-size:0.7rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--silver);margin-bottom:0.5rem;margin-top:1.5rem">5. Payments</p>
       <p style="margin-bottom:1rem">All payments are processed securely by Stripe. Prices are displayed in your selected currency and are subject to exchange rate fluctuations. Sondrift is not responsible for any fees charged by your bank or card issuer.</p>
 
-      <p style="font-size:0.7rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--silver);margin-bottom:0.5rem;margin-top:1.5rem">6. Governing Law</p>
+      <p style="font-size:0.7rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--silver);margin-bottom:0.5rem;margin-top:1.5rem">7. Content Standards & Therapeutic Use</p>
+      <p style="margin-bottom:1rem">All content produced and distributed by Sondrift Studio is intended solely for therapeutic, relaxation, and sensory wellness purposes. <strong style="color:var(--white)">Sondrift does not produce, distribute, or permit the creation of explicit, inappropriate, sexual, or adult content of any kind.</strong> All content is designed to be suitable for general audiences aged 13 and above. Any custom request deemed inappropriate, explicit, or contrary to these standards will be declined and refunded in full. Sondrift reserves the right to refuse any request at its sole discretion.</p>
+
+      <p style="font-size:0.7rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--silver);margin-bottom:0.5rem;margin-top:1.5rem">8. Governing Law</p>
       <p>These terms are governed by the laws of Singapore. Disputes shall be resolved through good-faith negotiation, and if necessary, through the courts of Singapore.</p>
     </div>
   </div>
