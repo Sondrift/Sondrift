@@ -1225,9 +1225,17 @@
   }
   .card-saved-flash.show { opacity: 1; }
 
-  /* ============================================
-     SUBSCRIPTION PLAN EDITOR
-  ============================================ */
+  /* Image card remove button */
+  .img-remove-btn {
+    position: absolute; top: 0.7rem; right: 0.7rem; z-index: 6;
+    width: 22px; height: 22px; border-radius: 50%;
+    background: rgba(10,10,10,0.8); border: 1px solid rgba(255,255,255,0.2);
+    color: var(--silver); cursor: none;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+  }
+  .img-remove-btn:hover { background: rgba(255,80,80,0.25); border-color: rgba(255,80,80,0.4); color: #ff6b6b; }
+  .img-remove-btn svg { width: 8px; height: 8px; }
   .plan-edit-btn {
     position: absolute; top: 1rem; right: 1rem; z-index: 6;
     width: 28px; height: 28px; border-radius: 50%;
@@ -1706,58 +1714,125 @@
 
     <!-- Images -->
     <div class="tab-content" id="images">
-      <div class="product-card fade-in">
-        <div class="product-thumb" style="background: linear-gradient(135deg, #1a2520 0%, #0f1a16 100%);">
-          <svg class="product-icon" viewBox="0 0 48 48" fill="none">
+
+      <!-- Image card 1 -->
+      <div class="product-card fade-in" id="ic1">
+        <div class="product-thumb" id="ithumb1" style="background: var(--dark);">
+          <svg class="product-icon" id="iicon1" viewBox="0 0 48 48" fill="none">
             <rect x="8" y="10" width="32" height="28" rx="1" stroke="#c8c8c8" stroke-width="1"/>
             <circle cx="17" cy="19" r="4" stroke="#c8c8c8" stroke-width="1" opacity="0.6"/>
             <path d="M8 32 L18 22 L28 30 L35 24 L40 30 L40 38 L8 38 Z" fill="#c8c8c8" opacity="0.15"/>
           </svg>
+          <!-- Uploaded image preview -->
+          <div id="ipreview1" style="display:none;position:absolute;inset:0;background-size:cover;background-position:center;background-repeat:no-repeat;"></div>
+          <!-- Upload zone -->
+          <div class="media-upload-zone" id="imuz1">
+            <button class="upload-zone-btn" onclick="document.getElementById('imf1').click()">
+              <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 8V2M3 5l3-3 3 3"/><path d="M1 10h10"/></svg>
+              Upload Image
+            </button>
+            <span class="upload-zone-label">JPG · PNG · WEBP</span>
+          </div>
+          <input type="file" id="imf1" accept="image/*" style="display:none" onchange="loadImage('1',this)">
+          <!-- Remove image button -->
+          <button class="img-remove-btn" id="imrm1" style="display:none" onclick="removeImage('1')">
+            <svg viewBox="0 0 8 8" fill="none"><path d="M1 1L7 7M7 1L1 7" stroke-width="1.5" stroke="currentColor"/></svg>
+          </button>
         </div>
-        <div class="product-body">
+        <div class="product-body editable-wrap">
+          <button class="edit-card-btn" id="ecib1" onclick="toggleCardEdit('ic1')" title="Edit name & description">
+            <svg viewBox="0 0 12 12" fill="none"><path d="M7.5 1.5L10.5 4.5L4 11H1V8L7.5 1.5Z" stroke-width="1.2"/><path d="M6 3L9 6" stroke-width="1.2"/></svg>
+          </button>
           <div class="product-type">Image · High Resolution</div>
-          <div class="product-name">Mist Over Pebble</div>
-          <div class="product-desc">A single smooth stone resting in shallow water, morning mist rising. 4K digital art.</div>
+          <div class="product-name" id="sn-ic1">Mist Over Pebble</div>
+          <input class="inline-name-input" id="sni-ic1" type="text" value="Mist Over Pebble" maxlength="48">
+          <div class="product-desc" id="sd-ic1">A single smooth stone resting in shallow water, morning mist rising. 4K digital art.</div>
+          <textarea class="inline-desc-input" id="sdi-ic1" maxlength="160">A single smooth stone resting in shallow water, morning mist rising. 4K digital art.</textarea>
+          <div class="card-edit-hint">Press Enter or click ✓ to save</div>
+          <div class="card-saved-flash" id="sf-ic1">Saved</div>
           <div class="product-footer">
             <div class="product-price"><span>SGD </span>4.90</div>
             <button class="btn-add">Add</button>
           </div>
         </div>
       </div>
-      <div class="product-card fade-in">
-        <div class="product-thumb" style="background: linear-gradient(135deg, #1a1a22 0%, #0f0f18 100%);">
-          <svg class="product-icon" viewBox="0 0 48 48" fill="none">
+
+      <!-- Image card 2 -->
+      <div class="product-card fade-in" id="ic2">
+        <div class="product-thumb" id="ithumb2" style="background: var(--dark);">
+          <svg class="product-icon" id="iicon2" viewBox="0 0 48 48" fill="none">
             <circle cx="24" cy="24" r="14" stroke="#c8c8c8" stroke-width="1" opacity="0.5"/>
             <circle cx="24" cy="24" r="8" stroke="#c8c8c8" stroke-width="1" opacity="0.7"/>
             <circle cx="24" cy="24" r="2" fill="#c8c8c8" opacity="0.9"/>
           </svg>
+          <div id="ipreview2" style="display:none;position:absolute;inset:0;background-size:cover;background-position:center;background-repeat:no-repeat;"></div>
+          <div class="media-upload-zone" id="imuz2">
+            <button class="upload-zone-btn" onclick="document.getElementById('imf2').click()">
+              <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 8V2M3 5l3-3 3 3"/><path d="M1 10h10"/></svg>
+              Upload Image
+            </button>
+            <span class="upload-zone-label">JPG · PNG · WEBP</span>
+          </div>
+          <input type="file" id="imf2" accept="image/*" style="display:none" onchange="loadImage('2',this)">
+          <button class="img-remove-btn" id="imrm2" style="display:none" onclick="removeImage('2')">
+            <svg viewBox="0 0 8 8" fill="none"><path d="M1 1L7 7M7 1L1 7" stroke-width="1.5" stroke="currentColor"/></svg>
+          </button>
         </div>
-        <div class="product-body">
+        <div class="product-body editable-wrap">
+          <button class="edit-card-btn" id="ecib2" onclick="toggleCardEdit('ic2')" title="Edit name & description">
+            <svg viewBox="0 0 12 12" fill="none"><path d="M7.5 1.5L10.5 4.5L4 11H1V8L7.5 1.5Z" stroke-width="1.2"/><path d="M6 3L9 6" stroke-width="1.2"/></svg>
+          </button>
           <div class="product-type">Image · High Resolution</div>
-          <div class="product-name">Concentric Calm</div>
-          <div class="product-desc">Geometric circles in deep charcoal and sage. Meditative visual anchor for practice or display.</div>
+          <div class="product-name" id="sn-ic2">Concentric Calm</div>
+          <input class="inline-name-input" id="sni-ic2" type="text" value="Concentric Calm" maxlength="48">
+          <div class="product-desc" id="sd-ic2">Geometric circles in deep charcoal and sage. Meditative visual anchor for practice or display.</div>
+          <textarea class="inline-desc-input" id="sdi-ic2" maxlength="160">Geometric circles in deep charcoal and sage. Meditative visual anchor for practice or display.</textarea>
+          <div class="card-edit-hint">Press Enter or click ✓ to save</div>
+          <div class="card-saved-flash" id="sf-ic2">Saved</div>
           <div class="product-footer">
             <div class="product-price"><span>SGD </span>4.90</div>
             <button class="btn-add">Add</button>
           </div>
         </div>
       </div>
-      <div class="product-card fade-in">
-        <div class="product-thumb" style="background: linear-gradient(135deg, #1e1a14 0%, #14120d 100%);">
-          <svg class="product-icon" viewBox="0 0 48 48" fill="none">
-            <path d="M24 8 C30 14 38 18 38 28 C38 36 32 42 24 42 C16 42 10 36 10 28 C10 18 18 14 24 8Z" stroke="#c8a96e" stroke-width="1" fill="none"/>
+
+      <!-- Image card 3 -->
+      <div class="product-card fade-in" id="ic3">
+        <div class="product-thumb" id="ithumb3" style="background: var(--dark);">
+          <svg class="product-icon" id="iicon3" viewBox="0 0 48 48" fill="none">
+            <path d="M24 8 C30 14 38 18 38 28 C38 36 32 42 24 42 C16 42 10 36 10 28 C10 18 18 14 24 8Z" stroke="#d4a853" stroke-width="1" fill="none"/>
           </svg>
+          <div id="ipreview3" style="display:none;position:absolute;inset:0;background-size:cover;background-position:center;background-repeat:no-repeat;"></div>
+          <div class="media-upload-zone" id="imuz3">
+            <button class="upload-zone-btn" onclick="document.getElementById('imf3').click()">
+              <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 8V2M3 5l3-3 3 3"/><path d="M1 10h10"/></svg>
+              Upload Image
+            </button>
+            <span class="upload-zone-label">JPG · PNG · WEBP</span>
+          </div>
+          <input type="file" id="imf3" accept="image/*" style="display:none" onchange="loadImage('3',this)">
+          <button class="img-remove-btn" id="imrm3" style="display:none" onclick="removeImage('3')">
+            <svg viewBox="0 0 8 8" fill="none"><path d="M1 1L7 7M7 1L1 7" stroke-width="1.5" stroke="currentColor"/></svg>
+          </button>
         </div>
-        <div class="product-body">
+        <div class="product-body editable-wrap">
+          <button class="edit-card-btn" id="ecib3" onclick="toggleCardEdit('ic3')" title="Edit name & description">
+            <svg viewBox="0 0 12 12" fill="none"><path d="M7.5 1.5L10.5 4.5L4 11H1V8L7.5 1.5Z" stroke-width="1.2"/><path d="M6 3L9 6" stroke-width="1.2"/></svg>
+          </button>
           <div class="product-type">Bundle · 5 Images</div>
-          <div class="product-name">Golden Hour Series</div>
-          <div class="product-desc">Five warm-toned images in amber and ochre. Perfect for screens, prints, or digital wallpaper.</div>
+          <div class="product-name" id="sn-ic3">Golden Hour Series</div>
+          <input class="inline-name-input" id="sni-ic3" type="text" value="Golden Hour Series" maxlength="48">
+          <div class="product-desc" id="sd-ic3">Five warm-toned images in amber and ochre. Perfect for screens, prints, or digital wallpaper.</div>
+          <textarea class="inline-desc-input" id="sdi-ic3" maxlength="160">Five warm-toned images in amber and ochre. Perfect for screens, prints, or digital wallpaper.</textarea>
+          <div class="card-edit-hint">Press Enter or click ✓ to save</div>
+          <div class="card-saved-flash" id="sf-ic3">Saved</div>
           <div class="product-footer">
             <div class="product-price"><span>SGD </span>18.90</div>
             <button class="btn-add">Add</button>
           </div>
         </div>
       </div>
+
     </div>
 
     <!-- Videos -->
@@ -2714,7 +2789,42 @@
   });
 
   // ============================================
-  const soundCards = ['sc1','sc2','sc3'];
+  // ============================================
+  // IMAGE CARD UPLOAD
+  // ============================================
+  function loadImage(id, input) {
+    const file = input.files[0];
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    const preview = document.getElementById('ipreview' + id);
+    const icon    = document.getElementById('iicon' + id);
+    const zone    = document.getElementById('imuz' + id);
+    const rmBtn   = document.getElementById('imrm' + id);
+    preview.style.backgroundImage = `url('${url}')`;
+    preview.style.display = 'block';
+    icon.style.display = 'none';
+    zone.classList.add('has-media');
+    rmBtn.style.display = 'flex';
+  }
+
+  function removeImage(id) {
+    const preview = document.getElementById('ipreview' + id);
+    const icon    = document.getElementById('iicon' + id);
+    const zone    = document.getElementById('imuz' + id);
+    const rmBtn   = document.getElementById('imrm' + id);
+    const input   = document.getElementById('imf' + id);
+    preview.style.backgroundImage = '';
+    preview.style.display = 'none';
+    icon.style.display = '';
+    zone.classList.remove('has-media');
+    rmBtn.style.display = 'none';
+    input.value = '';
+  }
+
+  // ============================================
+  // INLINE CARD EDITOR (Soundbites + Images)
+  // ============================================
+  const soundCards = ['sc1','sc2','sc3','ic1','ic2','ic3'];
   const cardNums   = ['1','2','3'];
 
   function toggleCardEdit(cardId) {
@@ -2733,31 +2843,37 @@
     }
   }
 
-  function openCardEdit(cardId) {
-    const num = cardId.replace('sc','');
-    const card = document.getElementById(cardId);
-    const nameInput = document.getElementById('sni' + num);
-    const descInput = document.getElementById('sdi' + num);
-    const nameDisp  = document.getElementById('sn' + num);
-    const descDisp  = document.getElementById('sd' + num);
-    const editBtn   = document.getElementById('ecb' + num);
+  function getCardIds(cardId) {
+    const isImage = cardId.startsWith('ic');
+    const suffix = isImage ? cardId.replace('ic', 'ic') : cardId.replace('sc', '');
+    const idKey  = isImage ? cardId : suffix;
+    return {
+      nameInput: document.getElementById(isImage ? 'sni-' + cardId  : 'sni' + suffix),
+      descInput: document.getElementById(isImage ? 'sdi-' + cardId  : 'sdi' + suffix),
+      nameDisp:  document.getElementById(isImage ? 'sn-'  + cardId  : 'sn'  + suffix),
+      descDisp:  document.getElementById(isImage ? 'sd-'  + cardId  : 'sd'  + suffix),
+      editBtn:   document.getElementById(isImage ? 'ecib' + cardId.replace('ic','') : 'ecb' + suffix),
+      flash:     document.getElementById(isImage ? 'sf-'  + cardId  : 'sf'  + suffix),
+    };
+  }
 
-    // Sync input values from current display text
+  function openCardEdit(cardId) {
+    const card = document.getElementById(cardId);
+    const ids  = getCardIds(cardId);
+    const { nameInput, descInput, nameDisp, descDisp, editBtn } = ids;
+
     nameInput.value = nameDisp.textContent;
     descInput.value = descDisp.textContent;
 
     card.classList.add('card-editing');
     editBtn.classList.add('active');
     editBtn.title = 'Save changes';
-    // Update pencil icon to checkmark
     editBtn.innerHTML = '<svg viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="currentColor" stroke-width="1.5"/></svg>';
 
-    // Auto-resize textarea
     autoResizeTextarea(descInput);
     nameInput.focus();
     nameInput.select();
 
-    // Enter on name jumps to description
     nameInput.onkeydown = function(e) {
       if (e.key === 'Enter') { e.preventDefault(); descInput.focus(); }
       if (e.key === 'Escape') saveCardEdit(cardId);
@@ -2770,16 +2886,10 @@
   }
 
   function saveCardEdit(cardId) {
-    const num = cardId.replace('sc','');
-    const card      = document.getElementById(cardId);
-    const nameInput = document.getElementById('sni' + num);
-    const descInput = document.getElementById('sdi' + num);
-    const nameDisp  = document.getElementById('sn' + num);
-    const descDisp  = document.getElementById('sd' + num);
-    const editBtn   = document.getElementById('ecb' + num);
-    const flash     = document.getElementById('sf' + num);
+    const card = document.getElementById(cardId);
+    const ids  = getCardIds(cardId);
+    const { nameInput, descInput, nameDisp, descDisp, editBtn, flash } = ids;
 
-    // Apply values (fallback to previous if empty)
     const newName = nameInput.value.trim();
     const newDesc = descInput.value.trim();
     if (newName) nameDisp.textContent = newName;
@@ -2787,13 +2897,11 @@
     nameInput.value = nameDisp.textContent;
     descInput.value = descDisp.textContent;
 
-    // Exit edit mode
     card.classList.remove('card-editing');
     editBtn.classList.remove('active');
     editBtn.title = 'Edit name & description';
     editBtn.innerHTML = '<svg viewBox="0 0 12 12" fill="none"><path d="M7.5 1.5L10.5 4.5L4 11H1V8L7.5 1.5Z" stroke-width="1.2"/><path d="M6 3L9 6" stroke-width="1.2"/></svg>';
 
-    // Flash "Saved" confirmation
     flash.classList.add('show');
     setTimeout(() => flash.classList.remove('show'), 1800);
   }
