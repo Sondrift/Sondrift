@@ -1225,6 +1225,206 @@
   }
   .card-saved-flash.show { opacity: 1; }
 
+  /* ============================================
+     PREFERENCE SURVEY MODAL
+  ============================================ */
+  .survey-backdrop {
+    position: fixed; inset: 0; z-index: 600;
+    background: rgba(5,5,5,0.92);
+    backdrop-filter: blur(8px);
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.4s ease;
+    padding: 1.5rem;
+  }
+  .survey-backdrop.open { opacity: 1; pointer-events: all; }
+
+  .survey-modal {
+    background: var(--off-black);
+    border: 1px solid rgba(255,255,255,0.07);
+    max-width: 680px; width: 100%;
+    max-height: 90vh; overflow-y: auto;
+    position: relative;
+    transform: translateY(24px) scale(0.98);
+    transition: transform 0.4s ease;
+    scrollbar-width: thin; scrollbar-color: var(--charcoal) transparent;
+  }
+  .survey-backdrop.open .survey-modal { transform: translateY(0) scale(1); }
+
+  .survey-header {
+    padding: 2rem 2.5rem 1.2rem;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    display: flex; align-items: flex-start; justify-content: space-between;
+    position: sticky; top: 0; background: var(--off-black); z-index: 2;
+  }
+  .survey-header-left .survey-eyebrow {
+    font-size: 0.58rem; letter-spacing: 0.3em; text-transform: uppercase;
+    color: var(--silver); margin-bottom: 0.4rem;
+    display: flex; align-items: center; gap: 0.8rem;
+  }
+  .survey-plan-tag {
+    background: var(--charcoal); color: var(--silver);
+    padding: 0.2rem 0.6rem; font-size: 0.55rem;
+    letter-spacing: 0.15em; text-transform: uppercase;
+  }
+  .survey-title {
+    font-family: var(--serif); font-size: 1.6rem; font-weight: 400;
+    color: var(--white); line-height: 1.1;
+  }
+  .survey-title em { font-style: italic; }
+
+  /* Progress bar */
+  .survey-progress {
+    padding: 0 2.5rem;
+    background: var(--off-black);
+    padding-top: 1rem; padding-bottom: 0.8rem;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    position: sticky; top: 72px; z-index: 2;
+  }
+  .survey-progress-track {
+    height: 2px; background: rgba(255,255,255,0.08); position: relative;
+  }
+  .survey-progress-fill {
+    position: absolute; left: 0; top: 0; bottom: 0;
+    background: var(--white); transition: width 0.4s ease;
+  }
+  .survey-progress-labels {
+    display: flex; justify-content: space-between;
+    margin-top: 0.5rem;
+  }
+  .survey-step-label {
+    font-size: 0.55rem; letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--mid); transition: color 0.3s; cursor: default;
+  }
+  .survey-step-label.active { color: var(--white); }
+  .survey-step-label.done { color: var(--silver); }
+
+  /* Steps */
+  .survey-body { padding: 2rem 2.5rem; }
+  .survey-step { display: none; }
+  .survey-step.active { display: block; }
+
+  .survey-q {
+    font-family: var(--serif); font-size: 1.2rem; font-weight: 400;
+    color: var(--white); margin-bottom: 0.4rem; line-height: 1.3;
+  }
+  .survey-q em { font-style: italic; }
+  .survey-hint {
+    font-size: 0.72rem; color: var(--mid); margin-bottom: 1.5rem;
+    line-height: 1.5;
+  }
+
+  /* Option cards — select one or many */
+  .survey-options {
+    display: grid; gap: 2px; margin-bottom: 1.5rem;
+  }
+  .survey-options.cols-2 { grid-template-columns: 1fr 1fr; }
+  .survey-options.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+
+  .survey-option {
+    background: var(--dark);
+    border: 1px solid rgba(255,255,255,0.06);
+    padding: 1rem 1.2rem; cursor: none;
+    transition: all 0.2s; position: relative;
+    display: flex; flex-direction: column; gap: 0.3rem;
+  }
+  .survey-option:hover { border-color: rgba(255,255,255,0.2); background: var(--charcoal); }
+  .survey-option.selected {
+    border-color: var(--white); background: var(--charcoal);
+  }
+  .survey-option.selected::after {
+    content: '✓';
+    position: absolute; top: 0.6rem; right: 0.8rem;
+    font-size: 0.7rem; color: var(--white);
+  }
+  .survey-option-icon {
+    font-size: 1.3rem; margin-bottom: 0.2rem; line-height: 1;
+  }
+  .survey-option-label {
+    font-family: var(--serif); font-size: 0.95rem; font-weight: 400;
+    color: var(--white); line-height: 1.2;
+  }
+  .survey-option-desc {
+    font-size: 0.68rem; color: var(--light-mid); line-height: 1.4;
+  }
+
+  /* Slider */
+  .survey-slider-wrap { margin-bottom: 1.5rem; }
+  .survey-slider-labels {
+    display: flex; justify-content: space-between;
+    font-size: 0.62rem; color: var(--mid); margin-bottom: 0.6rem;
+    letter-spacing: 0.08em;
+  }
+  .survey-slider {
+    width: 100%; accent-color: var(--white);
+  }
+  .survey-slider-val {
+    text-align: center; font-family: var(--serif);
+    font-size: 1.4rem; font-style: italic; color: var(--white);
+    margin-top: 0.5rem;
+  }
+
+  /* Text input */
+  .survey-textarea {
+    width: 100%; background: var(--dark);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: var(--off-white); padding: 0.9rem 1rem;
+    font-family: var(--sans); font-size: 0.85rem; font-weight: 300;
+    outline: none; resize: none; height: 90px; line-height: 1.6;
+    transition: border-color 0.25s; margin-bottom: 1.5rem;
+  }
+  .survey-textarea:focus { border-color: var(--silver); }
+  .survey-textarea::placeholder { color: var(--mid); }
+
+  /* Summary card */
+  .survey-summary {
+    background: var(--dark); padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+  .survey-summary-row {
+    display: flex; align-items: baseline; gap: 0.8rem;
+    padding: 0.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .survey-summary-row:last-child { border-bottom: none; }
+  .survey-summary-label {
+    font-size: 0.58rem; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--mid); min-width: 110px; flex-shrink: 0;
+  }
+  .survey-summary-val {
+    font-size: 0.82rem; color: var(--silver); line-height: 1.4;
+  }
+
+  /* Nav buttons */
+  .survey-nav {
+    display: flex; gap: 1rem; align-items: center;
+    justify-content: space-between; padding-top: 1rem;
+    border-top: 1px solid rgba(255,255,255,0.05);
+  }
+  .survey-back {
+    background: none; border: 1px solid rgba(255,255,255,0.1);
+    color: var(--mid); padding: 0.75rem 1.5rem;
+    font-family: var(--sans); font-size: 0.62rem;
+    font-weight: 400; letter-spacing: 0.18em; text-transform: uppercase;
+    cursor: none; transition: all 0.25s;
+  }
+  .survey-back:hover { border-color: var(--silver); color: var(--silver); }
+  .survey-next {
+    background: var(--white); color: var(--black);
+    border: none; padding: 0.85rem 2.5rem;
+    font-family: var(--sans); font-size: 0.65rem;
+    font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase;
+    cursor: none; transition: all 0.25s; margin-left: auto;
+  }
+  .survey-next:hover { background: var(--silver); }
+  .survey-next:disabled { opacity: 0.35; cursor: not-allowed; }
+  .survey-skip {
+    background: none; border: none; color: var(--mid);
+    font-size: 0.62rem; letter-spacing: 0.15em; text-transform: uppercase;
+    cursor: none; transition: color 0.2s; padding: 0.5rem;
+  }
+  .survey-skip:hover { color: var(--silver); }
+
   /* Image card remove button */
   .img-remove-btn {
     position: absolute; top: 0.7rem; right: 0.7rem; z-index: 6;
@@ -1453,7 +1653,7 @@
   <div class="hero-content">
     <div class="hero-eyebrow">Sound · Sensation · Story</div>
     <h1 class="hero-title">Where sound<br>meets <em>silence</em></h1>
-    <p class="hero-subtitle">Bespoke ASMR experiences crafted to soothe your senses</p>
+    <p class="hero-subtitle">Bespoke ASMR experiences curated to soothe your senses</p>
     <div class="hero-actions">
       <button class="btn-primary" onclick="openModal('shopModal')">Explore Collection</button>
       <button class="btn-ghost" onclick="openModal('subsModal')">Custom Subscription</button>
@@ -2130,7 +2330,6 @@
           <li>Dedicated creation profile</li>
           <li>Extended durations (up to 20 min)</li>
           <li>Exclusive content not sold in shop</li>
-          <li>Monthly 1-on-1 brief call</li>
           <li>Gift subscription option</li>
         </ul>
         <div class="plan-features-editor" id="pfedit-sa"></div>
@@ -2165,7 +2364,7 @@
             <div class="step-num">02</div>
             <div class="step-content">
               <h4>We create, exclusively for you</h4>
-              <p>Our studio crafts your piece within your chosen plan's timeline. One revision included.</p>
+              <p>Our studio crafts your piece within your chosen plan's timeline.</p>
             </div>
           </div>
           <div class="custom-step">
@@ -2274,7 +2473,7 @@
   <div class="footer-grid">
     <div class="footer-brand">
       <a href="#" class="logo"><span class="son">Son</span><span class="logo-mark"></span><span class="drift">drift</span></a>
-      <p>Bespoke ASMR experiences crafted to soothe your senses. Delivered worldwide.</p>
+      <p>Bespoke ASMR experiences curated to soothe your senses. Delivered worldwide.</p>
       <!-- Currency selector -->
       <div style="margin-top:1.2rem">
         <label style="font-size:0.55rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--mid);display:block;margin-bottom:0.4rem">Currency</label>
@@ -2312,7 +2511,6 @@
       <ul>
         <li><a href="#" onclick="openModal('privacyModal');return false">Privacy Policy</a></li>
         <li><a href="#" onclick="openModal('termsModal');return false">Terms of Service</a></li>
-        <li><a href="#" onclick="openModal('refundModal');return false">Refund Policy</a></li>
         <li><a href="#custom">Contact</a></li>
       </ul>
     </div>
@@ -2326,8 +2524,6 @@
       <a href="#" onclick="openModal('privacyModal');return false" style="color:var(--mid);text-decoration:none;transition:color 0.2s" onmouseover="this.style.color='var(--silver)'" onmouseout="this.style.color='var(--mid)'">Privacy</a>
       &nbsp;·&nbsp;
       <a href="#" onclick="openModal('termsModal');return false" style="color:var(--mid);text-decoration:none;transition:color 0.2s" onmouseover="this.style.color='var(--silver)'" onmouseout="this.style.color='var(--mid)'">Terms</a>
-      &nbsp;·&nbsp;
-      <a href="#" onclick="openModal('refundModal');return false" style="color:var(--mid);text-decoration:none;transition:color 0.2s" onmouseover="this.style.color='var(--silver)'" onmouseout="this.style.color='var(--mid)'">Refund Policy</a>
     </p>
   </div>
 </footer>
@@ -2579,7 +2775,6 @@
             <li>Dedicated creation profile</li>
             <li>Extended durations (up to 20 min)</li>
             <li>Exclusive content not sold in shop</li>
-            <li>Monthly 1-on-1 brief call</li>
           </ul>
           <button class="modal-plan-cta cta-ghost">Choose Sanctuary</button>
         </div>
@@ -2689,7 +2884,6 @@
       { text: 'Dedicated creation profile', dim: false },
       { text: 'Extended durations (up to 20 min)', dim: false },
       { text: 'Exclusive content not sold in shop', dim: false },
-      { text: 'Monthly 1-on-1 brief call', dim: false },
       { text: 'Gift subscription option', dim: false }
     ]
   };
@@ -3442,8 +3636,198 @@
     overlayVal.textContent = '50%';
   });
 
-  // Toggle controls panel on button click if image already set
-  uploadBtn.addEventListener('click', function(e) {
+  // ============================================
+  // PREFERENCE SURVEY
+  // ============================================
+  const TOTAL_STEPS = 7;
+  let surveyCurrentStep = 1;
+  let surveyPlanName = '';
+  let surveyStripeKey = '';
+
+  const surveyAnswers = {
+    mood: [], sound: [], env: '', voice: '',
+    duration: '8 minutes', timing: [],
+    personalNote: '', discover: []
+  };
+
+  function openSurvey(planName, stripeKey) {
+    surveyPlanName = planName;
+    surveyStripeKey = stripeKey;
+    document.getElementById('surveyPlanTag').textContent = planName;
+    document.getElementById('surveySubject').value = `New Sondrift Preference Profile — ${planName}`;
+    document.getElementById('surveyPlanInput').value = planName;
+    surveyCurrentStep = 1;
+    // Reset answers
+    Object.keys(surveyAnswers).forEach(k => {
+      surveyAnswers[k] = Array.isArray(surveyAnswers[k]) ? [] : '';
+    });
+    surveyAnswers.duration = '8 minutes';
+    document.getElementById('durationSlider').value = 8;
+    document.getElementById('durationVal').textContent = '8 minutes';
+    document.querySelectorAll('.survey-option.selected').forEach(o => o.classList.remove('selected'));
+    document.getElementById('surveyPersonalNote').value = '';
+    document.getElementById('surveyFormSuccess').style.display = 'none';
+    document.getElementById('surveyFormError').style.display = 'none';
+    showStep(1);
+    document.getElementById('surveyModal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeSurvey() {
+    document.getElementById('surveyModal').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  // Close on backdrop click
+  document.getElementById('surveyModal').addEventListener('click', function(e) {
+    if (e.target === this) closeSurvey();
+  });
+
+  function showStep(n) {
+    document.querySelectorAll('.survey-step').forEach(s => s.classList.remove('active'));
+    document.getElementById('step-' + n).classList.add('active');
+    const pct = Math.round(((n - 1) / (TOTAL_STEPS - 1)) * 100);
+    document.getElementById('surveyProgressFill').style.width = pct + '%';
+    for (let i = 1; i <= TOTAL_STEPS; i++) {
+      const lbl = document.getElementById('slbl-' + i);
+      lbl.classList.remove('active','done');
+      if (i === n) lbl.classList.add('active');
+      if (i < n)  lbl.classList.add('done');
+    }
+    if (n === TOTAL_STEPS) buildSummary();
+  }
+
+  function surveyNext() {
+    // Save current step answers
+    saveCurrentAnswers();
+    if (surveyCurrentStep < TOTAL_STEPS) {
+      surveyCurrentStep++;
+      showStep(surveyCurrentStep);
+    }
+  }
+
+  function surveyBack() {
+    if (surveyCurrentStep > 1) {
+      surveyCurrentStep--;
+      showStep(surveyCurrentStep);
+    }
+  }
+
+  function toggleOption(el, group, single) {
+    if (single) {
+      // Radio behaviour — deselect others in group
+      el.closest('.survey-options').querySelectorAll('.survey-option').forEach(o => o.classList.remove('selected'));
+    }
+    el.classList.toggle('selected');
+  }
+
+  function updateDuration(val) {
+    const label = val == 1 ? '1 minute' : val + ' minutes';
+    document.getElementById('durationVal').textContent = label;
+    surveyAnswers.duration = label;
+  }
+
+  function saveCurrentAnswers() {
+    const step = surveyCurrentStep;
+    if (step === 1) {
+      surveyAnswers.mood = getSelected('#opts-mood');
+    } else if (step === 2) {
+      surveyAnswers.sound = getSelected('#opts-sound');
+    } else if (step === 3) {
+      surveyAnswers.env = getSelected('#opts-env')[0] || '';
+    } else if (step === 4) {
+      surveyAnswers.voice = getSelected('#opts-voice')[0] || '';
+    } else if (step === 5) {
+      surveyAnswers.duration = document.getElementById('durationVal').textContent;
+      surveyAnswers.timing = getSelected('#opts-timing');
+    } else if (step === 6) {
+      surveyAnswers.personalNote = document.getElementById('surveyPersonalNote').value.trim();
+      surveyAnswers.discover = getSelected('#opts-discover');
+    }
+  }
+
+  function getSelected(containerSelector) {
+    const container = document.querySelector(containerSelector);
+    if (!container) return [];
+    return [...container.querySelectorAll('.survey-option.selected')].map(o => o.dataset.val);
+  }
+
+  function buildSummary() {
+    saveCurrentAnswers();
+    const rows = [
+      { label: 'Plan',        val: surveyPlanName },
+      { label: 'Mood Goals',  val: surveyAnswers.mood.join(', ') || '—' },
+      { label: 'Sounds',      val: surveyAnswers.sound.join(', ') || '—' },
+      { label: 'Environment', val: surveyAnswers.env || '—' },
+      { label: 'Voice',       val: surveyAnswers.voice || '—' },
+      { label: 'Duration',    val: surveyAnswers.duration || '—' },
+      { label: 'Listen when', val: surveyAnswers.timing.join(', ') || '—' },
+      { label: 'Personal note', val: surveyAnswers.personalNote || '—' },
+    ];
+    const summary = document.getElementById('surveySummary');
+    summary.innerHTML = rows.map(r => `
+      <div class="survey-summary-row">
+        <span class="survey-summary-label">${r.label}</span>
+        <span class="survey-summary-val">${r.val}</span>
+      </div>`).join('');
+
+    // Populate hidden inputs
+    document.getElementById('surveyMoodInput').value     = surveyAnswers.mood.join(', ');
+    document.getElementById('surveySoundInput').value    = surveyAnswers.sound.join(', ');
+    document.getElementById('surveyEnvInput').value      = surveyAnswers.env;
+    document.getElementById('surveyVoiceInput').value    = surveyAnswers.voice;
+    document.getElementById('surveyDurationInput').value = surveyAnswers.duration;
+    document.getElementById('surveyTimingInput').value   = surveyAnswers.timing.join(', ');
+    document.getElementById('surveyNoteInput').value     = surveyAnswers.personalNote;
+    document.getElementById('surveyDiscoverInput').value = surveyAnswers.discover.join(', ');
+  }
+
+  async function handleSurveySubmit(e) {
+    e.preventDefault();
+    const form = document.getElementById('surveySubmitForm');
+    const btn  = document.getElementById('surveySubmitBtn');
+    const ok   = document.getElementById('surveyFormSuccess');
+    const err  = document.getElementById('surveyFormError');
+
+    btn.textContent = 'Saving…';
+    btn.disabled = true;
+
+    try {
+      const res = await fetch(form.action, {
+        method: 'POST',
+        body: new FormData(form),
+        headers: { 'Accept': 'application/json' }
+      });
+      ok.style.display = 'block';
+      btn.textContent = 'Saved ✓';
+      // After 2s, redirect to Stripe
+      setTimeout(() => {
+        closeSurvey();
+        goToStripe(surveyStripeKey);
+        btn.textContent = 'Save Profile & Continue →';
+        btn.disabled = false;
+      }, 2000);
+    } catch {
+      err.style.display = 'block';
+      btn.textContent = 'Save Profile & Continue →';
+      btn.disabled = false;
+      // Still allow checkout even if form fails
+      setTimeout(() => { closeSurvey(); goToStripe(surveyStripeKey); }, 2500);
+    }
+  }
+
+  // Override plan CTA buttons to open survey first
+  function planCTA(planName, stripeKey) {
+    openSurvey(planName, stripeKey);
+  }
+
+  document.getElementById('pbtn-w')  && (document.getElementById('pbtn-w').onclick  = () => planCTA('Whisper',   'plan_whisper'));
+  document.getElementById('pbtn-s')  && (document.getElementById('pbtn-s').onclick   = () => planCTA('Serenity',  'plan_serenity'));
+  document.getElementById('pbtn-sa') && (document.getElementById('pbtn-sa').onclick  = () => planCTA('Sanctuary', 'plan_sanctuary'));
+  document.querySelectorAll('.modal-plan-cta').forEach((btn, i) => {
+    const plans = [['Whisper','plan_whisper'],['Serenity','plan_serenity'],['Sanctuary','plan_sanctuary']];
+    if (plans[i]) btn.onclick = () => planCTA(...plans[i]);
+  });
     if (hasImage) {
       e.preventDefault();
       e.stopPropagation();
@@ -3707,7 +4091,7 @@
       <p style="margin-bottom:1rem">All products sold by Sondrift Studio are digital goods delivered electronically. Upon successful payment, you will receive access to your files via email delivery. Files are for personal, non-commercial use only. You may not redistribute, resell, or publicly broadcast any content purchased from Sondrift.</p>
 
       <p style="font-size:0.7rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--silver);margin-bottom:0.5rem;margin-top:1.5rem">2. Custom Orders</p>
-      <p style="margin-bottom:1rem">Custom content is created exclusively for the requesting customer and will not be resold or reused. Delivery timelines are estimates and may vary. One revision is included with each custom order. Additional revisions may be requested at an additional fee.</p>
+      <p style="margin-bottom:1rem">Custom content is created exclusively for the requesting customer and will not be resold or reused. Delivery timelines are estimates and may vary.</p>
 
       <p style="font-size:0.7rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--silver);margin-bottom:0.5rem;margin-top:1.5rem">3. Subscriptions</p>
       <p style="margin-bottom:1rem">Subscription plans renew automatically on a monthly basis. You may cancel at any time from your account or by emailing us. Cancellations take effect at the end of your current billing period. No partial refunds are issued for unused days within a billing period.</p>
@@ -3727,34 +4111,324 @@
   </div>
 </div>
 
-<!-- Refund Policy -->
-<div class="modal-backdrop" id="refundModal">
-  <div class="modal">
-    <div class="modal-header">
-      <div class="modal-header-left">
-        <div class="modal-eyebrow">Legal</div>
-        <h2 class="modal-title">Refund <em>Policy</em></h2>
+<!-- ============================================
+     PREFERENCE SURVEY MODAL
+============================================ -->
+<div class="survey-backdrop" id="surveyModal">
+  <div class="survey-modal">
+
+    <!-- Header -->
+    <div class="survey-header">
+      <div class="survey-header-left">
+        <div class="survey-eyebrow">
+          Personalisation Survey
+          <span class="survey-plan-tag" id="surveyPlanTag">Whisper</span>
+        </div>
+        <h2 class="survey-title">Help us craft your <em>perfect</em> sound</h2>
       </div>
-      <div class="modal-header-right">
-        <button class="btn-modal-close" onclick="closeModal('refundModal')">
-          <svg viewBox="0 0 12 12" fill="none"><path d="M2 2L10 10M10 2L2 10" stroke-width="1.5"/></svg>
-        </button>
+      <button class="btn-modal-close" onclick="closeSurvey()" style="flex-shrink:0;margin-top:0.2rem">
+        <svg viewBox="0 0 12 12" fill="none"><path d="M2 2L10 10M10 2L2 10" stroke-width="1.5"/></svg>
+      </button>
+    </div>
+
+    <!-- Progress -->
+    <div class="survey-progress">
+      <div class="survey-progress-track">
+        <div class="survey-progress-fill" id="surveyProgressFill" style="width:14%"></div>
+      </div>
+      <div class="survey-progress-labels">
+        <span class="survey-step-label active" id="slbl-1">Mood</span>
+        <span class="survey-step-label" id="slbl-2">Sound</span>
+        <span class="survey-step-label" id="slbl-3">Environment</span>
+        <span class="survey-step-label" id="slbl-4">Voice</span>
+        <span class="survey-step-label" id="slbl-5">Timing</span>
+        <span class="survey-step-label" id="slbl-6">Themes</span>
+        <span class="survey-step-label" id="slbl-7">Review</span>
       </div>
     </div>
-    <div class="modal-body" style="font-size:0.82rem;line-height:1.9;color:var(--light-mid)">
-      <p style="margin-bottom:1rem;color:var(--silver)">Last updated: May 2026</p>
 
-      <p style="font-size:0.7rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--silver);margin-bottom:0.5rem;margin-top:1.5rem">Ready-Made Digital Products</p>
-      <p style="margin-bottom:1rem">Due to the nature of digital goods, all sales of ready-made soundbites, images, and videos are <strong style="color:var(--white)">final and non-refundable</strong> once the file has been delivered. If you experience a technical issue preventing you from accessing your purchase, please contact us within 7 days and we will resolve it promptly.</p>
+    <div class="survey-body">
 
-      <p style="font-size:0.7rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--silver);margin-bottom:0.5rem;margin-top:1.5rem">Custom Orders</p>
-      <p style="margin-bottom:1rem">Custom orders may be cancelled for a full refund within <strong style="color:var(--white)">24 hours of payment</strong>, provided production has not yet begun. Once work has commenced, refunds are not available. If you are unsatisfied with your custom content, we will offer one complimentary revision.</p>
+      <!-- Step 1: Primary Mood Goal -->
+      <div class="survey-step active" id="step-1">
+        <div class="survey-q">What are you seeking when you listen?</div>
+        <div class="survey-hint">Select all that apply — we'll prioritise the top ones.</div>
+        <div class="survey-options cols-2" id="opts-mood">
+          <div class="survey-option" data-val="Deep sleep & rest" onclick="toggleOption(this,'mood')">
+            <div class="survey-option-icon">🌙</div>
+            <div class="survey-option-label">Deep sleep & rest</div>
+            <div class="survey-option-desc">Wind down, drift off, stay asleep</div>
+          </div>
+          <div class="survey-option" data-val="Stress & anxiety relief" onclick="toggleOption(this,'mood')">
+            <div class="survey-option-icon">🌿</div>
+            <div class="survey-option-label">Stress & anxiety relief</div>
+            <div class="survey-option-desc">Quiet the mind, ease tension</div>
+          </div>
+          <div class="survey-option" data-val="Focus & deep work" onclick="toggleOption(this,'mood')">
+            <div class="survey-option-icon">🕯</div>
+            <div class="survey-option-label">Focus & deep work</div>
+            <div class="survey-option-desc">Ambient background for concentration</div>
+          </div>
+          <div class="survey-option" data-val="Emotional release" onclick="toggleOption(this,'mood')">
+            <div class="survey-option-icon">🌊</div>
+            <div class="survey-option-label">Emotional release</div>
+            <div class="survey-option-desc">Process feelings, feel held</div>
+          </div>
+          <div class="survey-option" data-val="Meditation & mindfulness" onclick="toggleOption(this,'mood')">
+            <div class="survey-option-icon">☁️</div>
+            <div class="survey-option-label">Meditation & mindfulness</div>
+            <div class="survey-option-desc">Presence, breath, stillness</div>
+          </div>
+          <div class="survey-option" data-val="Joy & gentle pleasure" onclick="toggleOption(this,'mood')">
+            <div class="survey-option-icon">✨</div>
+            <div class="survey-option-label">Joy & gentle pleasure</div>
+            <div class="survey-option-desc">Delight, comfort, warmth</div>
+          </div>
+        </div>
+        <div class="survey-nav">
+          <button class="survey-skip" onclick="surveyNext()">Skip this step</button>
+          <button class="survey-next" onclick="surveyNext()">Continue →</button>
+        </div>
+      </div>
 
-      <p style="font-size:0.7rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--silver);margin-bottom:0.5rem;margin-top:1.5rem">Subscriptions</p>
-      <p style="margin-bottom:1rem">You may cancel your subscription at any time. Your plan will remain active until the end of the current billing cycle. <strong style="color:var(--white)">No refunds are issued for partial months.</strong> If content was not delivered within the agreed timeframe due to our error, you may request a credit toward your next billing cycle.</p>
+      <!-- Step 2: Sound Texture -->
+      <div class="survey-step" id="step-2">
+        <div class="survey-q">Which sounds resonate most with you?</div>
+        <div class="survey-hint">Select your favourites — this shapes the texture of everything we make for you.</div>
+        <div class="survey-options cols-3" id="opts-sound">
+          <div class="survey-option" data-val="Rainfall & water" onclick="toggleOption(this,'sound')">
+            <div class="survey-option-icon">🌧</div>
+            <div class="survey-option-label">Rain & water</div>
+          </div>
+          <div class="survey-option" data-val="Crackling fire" onclick="toggleOption(this,'sound')">
+            <div class="survey-option-icon">🔥</div>
+            <div class="survey-option-label">Crackling fire</div>
+          </div>
+          <div class="survey-option" data-val="Forest & nature" onclick="toggleOption(this,'sound')">
+            <div class="survey-option-icon">🌲</div>
+            <div class="survey-option-label">Forest & nature</div>
+          </div>
+          <div class="survey-option" data-val="Ocean & waves" onclick="toggleOption(this,'sound')">
+            <div class="survey-option-icon">🌊</div>
+            <div class="survey-option-label">Ocean & waves</div>
+          </div>
+          <div class="survey-option" data-val="Soft whispers" onclick="toggleOption(this,'sound')">
+            <div class="survey-option-icon">🤫</div>
+            <div class="survey-option-label">Soft whispers</div>
+          </div>
+          <div class="survey-option" data-val="Paper & textures" onclick="toggleOption(this,'sound')">
+            <div class="survey-option-icon">📄</div>
+            <div class="survey-option-label">Paper & textures</div>
+          </div>
+          <div class="survey-option" data-val="Keyboard & typing" onclick="toggleOption(this,'sound')">
+            <div class="survey-option-icon">⌨️</div>
+            <div class="survey-option-label">Keyboard & typing</div>
+          </div>
+          <div class="survey-option" data-val="Wind & breeze" onclick="toggleOption(this,'sound')">
+            <div class="survey-option-icon">💨</div>
+            <div class="survey-option-label">Wind & breeze</div>
+          </div>
+          <div class="survey-option" data-val="Ambient drones" onclick="toggleOption(this,'sound')">
+            <div class="survey-option-icon">🎵</div>
+            <div class="survey-option-label">Ambient drones</div>
+          </div>
+        </div>
+        <div class="survey-nav">
+          <button class="survey-back" onclick="surveyBack()">← Back</button>
+          <button class="survey-skip" onclick="surveyNext()">Skip</button>
+          <button class="survey-next" onclick="surveyNext()">Continue →</button>
+        </div>
+      </div>
 
-      <p style="font-size:0.7rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--silver);margin-bottom:0.5rem;margin-top:1.5rem">How to Request a Refund</p>
-      <p>Email us at <strong style="color:var(--white)">contact@sondrift.com</strong> with your order details and the reason for your request. We aim to respond within 2 business days. We are committed to resolving all concerns fairly and promptly.</p>
+      <!-- Step 3: Environment / Setting -->
+      <div class="survey-step" id="step-3">
+        <div class="survey-q">Where does your mind go when you want to <em>escape</em>?</div>
+        <div class="survey-hint">Choose the setting that feels most like home to your senses.</div>
+        <div class="survey-options cols-2" id="opts-env">
+          <div class="survey-option" data-val="Deep forest" onclick="toggleOption(this,'env',true)">
+            <div class="survey-option-label">Deep forest</div>
+            <div class="survey-option-desc">Ancient trees, soft undergrowth, birdsong at dusk</div>
+          </div>
+          <div class="survey-option" data-val="Coastal cliff" onclick="toggleOption(this,'env',true)">
+            <div class="survey-option-label">Coastal cliff</div>
+            <div class="survey-option-desc">Salt air, crashing waves, open sky</div>
+          </div>
+          <div class="survey-option" data-val="Rainy room" onclick="toggleOption(this,'env',true)">
+            <div class="survey-option-label">Rainy room</div>
+            <div class="survey-option-desc">Warm indoors, rain on glass, soft lamp light</div>
+          </div>
+          <div class="survey-option" data-val="Japanese garden" onclick="toggleOption(this,'env',true)">
+            <div class="survey-option-label">Japanese garden</div>
+            <div class="survey-option-desc">Raked stone, water, bamboo, quiet ceremony</div>
+          </div>
+          <div class="survey-option" data-val="Desert at night" onclick="toggleOption(this,'env',true)">
+            <div class="survey-option-label">Desert at night</div>
+            <div class="survey-option-desc">Vast silence, stars, cool air after heat</div>
+          </div>
+          <div class="survey-option" data-val="Somewhere personal" onclick="toggleOption(this,'env',true)">
+            <div class="survey-option-label">Somewhere personal</div>
+            <div class="survey-option-desc">I'll describe my own place in the request form</div>
+          </div>
+        </div>
+        <div class="survey-nav">
+          <button class="survey-back" onclick="surveyBack()">← Back</button>
+          <button class="survey-skip" onclick="surveyNext()">Skip</button>
+          <button class="survey-next" onclick="surveyNext()">Continue →</button>
+        </div>
+      </div>
+
+      <!-- Step 4: Voice Preference -->
+      <div class="survey-step" id="step-4">
+        <div class="survey-q">Do you want a voice in your content?</div>
+        <div class="survey-hint">This applies to soundbites and video content.</div>
+        <div class="survey-options cols-2" id="opts-voice">
+          <div class="survey-option" data-val="No voice — pure sound only" onclick="toggleOption(this,'voice',true)">
+            <div class="survey-option-label">No voice</div>
+            <div class="survey-option-desc">Pure ambient sound, no speaking</div>
+          </div>
+          <div class="survey-option" data-val="Soft whisper" onclick="toggleOption(this,'voice',true)">
+            <div class="survey-option-label">Soft whisper</div>
+            <div class="survey-option-desc">Barely-audible, intimate, close</div>
+          </div>
+          <div class="survey-option" data-val="Gentle spoken voice" onclick="toggleOption(this,'voice',true)">
+            <div class="survey-option-label">Gentle spoken voice</div>
+            <div class="survey-option-desc">Calm, unhurried, soothing tone</div>
+          </div>
+          <div class="survey-option" data-val="Guided affirmations" onclick="toggleOption(this,'voice',true)">
+            <div class="survey-option-label">Guided affirmations</div>
+            <div class="survey-option-desc">Gentle encouragement, personal words</div>
+          </div>
+        </div>
+        <div class="survey-nav">
+          <button class="survey-back" onclick="surveyBack()">← Back</button>
+          <button class="survey-skip" onclick="surveyNext()">Skip</button>
+          <button class="survey-next" onclick="surveyNext()">Continue →</button>
+        </div>
+      </div>
+
+      <!-- Step 5: Timing & Length -->
+      <div class="survey-step" id="step-5">
+        <div class="survey-q">How long do you typically listen?</div>
+        <div class="survey-hint">Drag to set your ideal content duration.</div>
+        <div class="survey-slider-wrap">
+          <div class="survey-slider-labels">
+            <span>2 min</span><span>5 min</span><span>10 min</span><span>15 min</span><span>20 min</span>
+          </div>
+          <input type="range" class="survey-slider" id="durationSlider" min="2" max="20" value="8" step="1" oninput="updateDuration(this.value)">
+          <div class="survey-slider-val" id="durationVal">8 minutes</div>
+        </div>
+        <div class="survey-q" style="margin-top:1.5rem">When do you usually listen?</div>
+        <div class="survey-hint">Select all that apply.</div>
+        <div class="survey-options cols-3" id="opts-timing">
+          <div class="survey-option" data-val="Morning ritual" onclick="toggleOption(this,'timing')">
+            <div class="survey-option-label">Morning</div>
+            <div class="survey-option-desc">Starting the day gently</div>
+          </div>
+          <div class="survey-option" data-val="Afternoon break" onclick="toggleOption(this,'timing')">
+            <div class="survey-option-label">Afternoon</div>
+            <div class="survey-option-desc">Midday reset</div>
+          </div>
+          <div class="survey-option" data-val="Evening wind-down" onclick="toggleOption(this,'timing')">
+            <div class="survey-option-label">Evening</div>
+            <div class="survey-option-desc">Transitioning to rest</div>
+          </div>
+          <div class="survey-option" data-val="Bedtime" onclick="toggleOption(this,'timing')">
+            <div class="survey-option-label">Bedtime</div>
+            <div class="survey-option-desc">Falling asleep</div>
+          </div>
+          <div class="survey-option" data-val="During work" onclick="toggleOption(this,'timing')">
+            <div class="survey-option-label">Work hours</div>
+            <div class="survey-option-desc">Background focus</div>
+          </div>
+          <div class="survey-option" data-val="Anytime" onclick="toggleOption(this,'timing')">
+            <div class="survey-option-label">Anytime</div>
+            <div class="survey-option-desc">Whenever I need it</div>
+          </div>
+        </div>
+        <div class="survey-nav">
+          <button class="survey-back" onclick="surveyBack()">← Back</button>
+          <button class="survey-skip" onclick="surveyNext()">Skip</button>
+          <button class="survey-next" onclick="surveyNext()">Continue →</button>
+        </div>
+      </div>
+
+      <!-- Step 6: Themes & Personal Note -->
+      <div class="survey-step" id="step-6">
+        <div class="survey-q">Any themes, memories, or words we should know?</div>
+        <div class="survey-hint">Optional — but the more you share, the more personal your content will be. Nothing is too abstract.</div>
+        <textarea class="survey-textarea" id="surveyPersonalNote" placeholder="A particular memory, a feeling, a colour, a season, a word that captures where you want to go…" maxlength="400"></textarea>
+        <div class="survey-q">How do you discover ASMR?</div>
+        <div class="survey-hint">Helps us understand you better.</div>
+        <div class="survey-options cols-3" id="opts-discover">
+          <div class="survey-option" data-val="YouTube" onclick="toggleOption(this,'discover')">
+            <div class="survey-option-label">YouTube</div>
+          </div>
+          <div class="survey-option" data-val="Spotify / podcasts" onclick="toggleOption(this,'discover')">
+            <div class="survey-option-label">Spotify</div>
+          </div>
+          <div class="survey-option" data-val="TikTok / Reels" onclick="toggleOption(this,'discover')">
+            <div class="survey-option-label">TikTok / Reels</div>
+          </div>
+          <div class="survey-option" data-val="Recommendation" onclick="toggleOption(this,'discover')">
+            <div class="survey-option-label">Recommendation</div>
+          </div>
+          <div class="survey-option" data-val="Search / Google" onclick="toggleOption(this,'discover')">
+            <div class="survey-option-label">Search / Google</div>
+          </div>
+          <div class="survey-option" data-val="Other" onclick="toggleOption(this,'discover')">
+            <div class="survey-option-label">Other</div>
+          </div>
+        </div>
+        <div class="survey-nav">
+          <button class="survey-back" onclick="surveyBack()">← Back</button>
+          <button class="survey-skip" onclick="surveyNext()">Skip</button>
+          <button class="survey-next" onclick="surveyNext()">Review →</button>
+        </div>
+      </div>
+
+      <!-- Step 7: Summary & Submit -->
+      <div class="survey-step" id="step-7">
+        <div class="survey-q">Your <em>sensory profile</em></div>
+        <div class="survey-hint">Here's what we've captured. You can go back to edit anything.</div>
+        <div class="survey-summary" id="surveySummary"></div>
+
+        <div class="survey-q" style="margin-top:0">One last thing — your details</div>
+        <div class="survey-hint">So we can attach your profile to your plan.</div>
+        <!-- FORMSPREE: Replace YOUR_SURVEY_FORM_ID with a new Formspree form for surveys -->
+        <form id="surveySubmitForm" action="https://formspree.io/f/YOUR_SURVEY_FORM_ID" method="POST" onsubmit="handleSurveySubmit(event)">
+          <input type="hidden" name="_subject" id="surveySubject" value="New Sondrift Preference Profile">
+          <input type="hidden" name="plan" id="surveyPlanInput" value="">
+          <input type="hidden" name="mood_goals" id="surveyMoodInput" value="">
+          <input type="hidden" name="sound_preferences" id="surveySoundInput" value="">
+          <input type="hidden" name="environment" id="surveyEnvInput" value="">
+          <input type="hidden" name="voice_preference" id="surveyVoiceInput" value="">
+          <input type="hidden" name="duration" id="surveyDurationInput" value="">
+          <input type="hidden" name="listening_times" id="surveyTimingInput" value="">
+          <input type="hidden" name="personal_note" id="surveyNoteInput" value="">
+          <input type="hidden" name="discovery_source" id="surveyDiscoverInput" value="">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem">
+            <div class="form-group" style="margin-bottom:0">
+              <label class="form-label">Your Name</label>
+              <input type="text" name="name" class="form-input" placeholder="Your name" required>
+            </div>
+            <div class="form-group" style="margin-bottom:0">
+              <label class="form-label">Your Email</label>
+              <input type="email" name="email" class="form-input" placeholder="Your email" required>
+            </div>
+          </div>
+          <div id="surveyFormSuccess" style="display:none;padding:0.8rem 1rem;background:rgba(255,255,255,0.04);border-left:2px solid var(--white);margin-bottom:1rem;font-size:0.78rem;color:var(--silver)">
+            ✓ Profile saved! We'll use this to craft your content. Redirecting to checkout…
+          </div>
+          <div id="surveyFormError" style="display:none;padding:0.8rem 1rem;background:rgba(255,80,80,0.06);border-left:2px solid #ff6b6b;margin-bottom:1rem;font-size:0.78rem;color:#ff9999">
+            Something went wrong. Please email contact@sondrift.com with your preferences.
+          </div>
+          <div class="survey-nav" style="border-top:none;padding-top:0">
+            <button type="button" class="survey-back" onclick="surveyBack()">← Back</button>
+            <button type="submit" class="survey-next" id="surveySubmitBtn">Save Profile & Continue →</button>
+          </div>
+        </form>
+      </div>
+
     </div>
   </div>
 </div>
