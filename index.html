@@ -2136,35 +2136,66 @@
 
       <div class="custom-form-preview fade-in">
         <div class="form-title">Begin a Drift</div>
-        <div class="form-sub">For Sanctuary & Serenity members</div>
-        <div class="form-group">
-          <label class="form-label">Your Name</label>
-          <input type="text" class="form-input" placeholder="As you'd like it whispered">
-        </div>
-        <div class="form-row">
+        <div class="form-sub">For Sanctuary & Serenity members · Worldwide delivery</div>
+        <!-- FORMSPREE: Replace YOUR_FORM_ID below with your Formspree form ID -->
+        <form id="customRequestForm" action="https://formspree.io/f/YOUR_FORM_ID" method="POST" onsubmit="handleFormSubmit(event)">
+          <input type="hidden" name="_subject" value="New Sondrift Custom Request">
+          <input type="hidden" name="_replyto" value="contact@sondrift.com">
           <div class="form-group">
-            <label class="form-label">Content Type</label>
-            <select class="form-select">
-              <option>Soundbite</option>
-              <option>Image</option>
-              <option>Video</option>
-            </select>
+            <label class="form-label">Your Name</label>
+            <input type="text" name="name" class="form-input" placeholder="As you'd like it whispered" required>
           </div>
           <div class="form-group">
-            <label class="form-label">Mood</label>
-            <select class="form-select">
-              <option>Grounding</option>
-              <option>Sleep</option>
-              <option>Focus</option>
-              <option>Release</option>
+            <label class="form-label">Your Email</label>
+            <input type="email" name="email" class="form-input" placeholder="Where we'll deliver your content" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Your Country</label>
+            <select name="country" class="form-select">
+              <option value="">Select your country...</option>
+              <option>Australia</option><option>Canada</option><option>China</option>
+              <option>France</option><option>Germany</option><option>Hong Kong</option>
+              <option>India</option><option>Indonesia</option><option>Japan</option>
+              <option>Malaysia</option><option>New Zealand</option><option>Philippines</option>
+              <option>Singapore</option><option>South Korea</option><option>Taiwan</option>
+              <option>Thailand</option><option>United Kingdom</option><option>United States</option>
+              <option>Vietnam</option><option>Other</option>
             </select>
           </div>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Describe your stillness</label>
-          <textarea class="form-textarea" placeholder="A forest after rain. The sound of a train at night. A voice you almost remember..."></textarea>
-        </div>
-        <button class="btn-primary" style="width:100%; text-align:center; display:block">Send Request</button>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Content Type</label>
+              <select name="content_type" class="form-select">
+                <option>Soundbite</option>
+                <option>Image</option>
+                <option>Video</option>
+                <option>Voice Recording</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Mood</label>
+              <select name="mood" class="form-select">
+                <option>Grounding</option>
+                <option>Sleep</option>
+                <option>Focus</option>
+                <option>Release</option>
+                <option>Joy</option>
+                <option>Grief</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Describe your vision</label>
+            <textarea name="description" class="form-textarea" placeholder="A forest after rain. The sound of a train at night. A voice you almost remember..." required></textarea>
+          </div>
+          <div id="formSuccess" style="display:none;padding:0.8rem 1rem;background:rgba(255,255,255,0.04);border-left:2px solid var(--white);margin-bottom:1rem;font-size:0.78rem;color:var(--silver)">
+            ✓ Your request has been sent. We'll be in touch within 48 hours.
+          </div>
+          <div id="formError" style="display:none;padding:0.8rem 1rem;background:rgba(255,80,80,0.06);border-left:2px solid #ff6b6b;margin-bottom:1rem;font-size:0.78rem;color:#ff9999">
+            Something went wrong. Please email us directly at contact@sondrift.com
+          </div>
+          <button type="submit" class="btn-primary" id="formSubmitBtn" style="width:100%;text-align:center;display:block">Send Request</button>
+        </form>
       </div>
     </div>
   </div>
@@ -2199,39 +2230,58 @@
   <div class="footer-grid">
     <div class="footer-brand">
       <a href="#" class="logo"><span class="son">Son</span><span class="logo-mark"></span><span class="drift">drift</span></a>
-      <p>Sound experiences crafted for those who drift. Based in Singapore. Delivered worldwide.</p>
+      <p>Bespoke ASMR experiences crafted to soothe your senses. Delivered worldwide.</p>
+      <!-- Currency selector -->
+      <div style="margin-top:1.2rem">
+        <label style="font-size:0.55rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--mid);display:block;margin-bottom:0.4rem">Currency</label>
+        <select id="currencySelect" onchange="changeCurrency(this.value)" style="background:var(--dark);border:1px solid rgba(255,255,255,0.1);color:var(--silver);padding:0.4rem 0.8rem;font-family:var(--sans);font-size:0.75rem;outline:none;cursor:pointer">
+          <option value="SGD" selected>SGD — Singapore Dollar</option>
+          <option value="USD">USD — US Dollar</option>
+          <option value="GBP">GBP — British Pound</option>
+          <option value="EUR">EUR — Euro</option>
+          <option value="AUD">AUD — Australian Dollar</option>
+          <option value="JPY">JPY — Japanese Yen</option>
+          <option value="CAD">CAD — Canadian Dollar</option>
+        </select>
+      </div>
     </div>
     <div class="footer-col">
       <h5>Shop</h5>
       <ul>
-        <li><a href="#">Soundbites</a></li>
-        <li><a href="#">Images</a></li>
-        <li><a href="#">Videos</a></li>
-        <li><a href="#">Bundles</a></li>
+        <li><a href="#shop" onclick="switchTabByName('sounds')">Soundbites</a></li>
+        <li><a href="#shop" onclick="switchTabByName('images')">Images</a></li>
+        <li><a href="#shop" onclick="switchTabByName('videos')">Videos</a></li>
+        <li><a href="#shop">Bundles</a></li>
       </ul>
     </div>
     <div class="footer-col">
       <h5>Plans</h5>
       <ul>
-        <li><a href="#">Whisper</a></li>
-        <li><a href="#">Serenity</a></li>
-        <li><a href="#">Sanctuary</a></li>
-        <li><a href="#">Gift a Plan</a></li>
+        <li><a href="#pricing">Whisper</a></li>
+        <li><a href="#pricing">Serenity</a></li>
+        <li><a href="#pricing">Sanctuary</a></li>
+        <li><a href="#pricing">Gift a Plan</a></li>
       </ul>
     </div>
     <div class="footer-col">
-      <h5>Studio</h5>
+      <h5>Legal</h5>
       <ul>
-        <li><a href="#">About</a></li>
-        <li><a href="#">Process</a></li>
-        <li><a href="#">FAQ</a></li>
-        <li><a href="#">Contact</a></li>
+        <li><a href="#" onclick="openModal('privacyModal');return false">Privacy Policy</a></li>
+        <li><a href="#" onclick="openModal('termsModal');return false">Terms of Service</a></li>
+        <li><a href="#" onclick="openModal('refundModal');return false">Refund Policy</a></li>
+        <li><a href="#custom">Contact</a></li>
       </ul>
     </div>
   </div>
   <div class="footer-bottom">
     <p>© 2026 Sondrift Studio. All rights reserved.</p>
-    <p style="color:var(--charcoal)">Privacy · Terms · Refund Policy</p>
+    <p>
+      <a href="#" onclick="openModal('privacyModal');return false" style="color:var(--mid);text-decoration:none;transition:color 0.2s" onmouseover="this.style.color='var(--silver)'" onmouseout="this.style.color='var(--mid)'">Privacy</a>
+      &nbsp;·&nbsp;
+      <a href="#" onclick="openModal('termsModal');return false" style="color:var(--mid);text-decoration:none;transition:color 0.2s" onmouseover="this.style.color='var(--silver)'" onmouseout="this.style.color='var(--mid)'">Terms</a>
+      &nbsp;·&nbsp;
+      <a href="#" onclick="openModal('refundModal');return false" style="color:var(--mid);text-decoration:none;transition:color 0.2s" onmouseover="this.style.color='var(--silver)'" onmouseout="this.style.color='var(--mid)'">Refund Policy</a>
+    </p>
   </div>
 </footer>
 
@@ -3353,6 +3403,309 @@
       controls.classList.toggle('visible');
     }
   });
+
+  // ============================================
+  // STRIPE PAYMENT LINKS
+  // ============================================
+  // STEP 1: Create products in your Stripe dashboard
+  // STEP 2: Get payment links and replace the placeholder URLs below
+  // STEP 3: For subscriptions, create recurring price links
+
+  const STRIPE_LINKS = {
+    // One-time shop purchases — replace with your Stripe Payment Links
+    soundbite_single:   'https://buy.stripe.com/YOUR_SOUNDBITE_SINGLE',
+    soundbite_bundle:   'https://buy.stripe.com/YOUR_SOUNDBITE_BUNDLE',
+    soundbite_custom:   'https://buy.stripe.com/YOUR_SOUNDBITE_CUSTOM',
+    image_single:       'https://buy.stripe.com/YOUR_IMAGE_SINGLE',
+    image_bundle:       'https://buy.stripe.com/YOUR_IMAGE_BUNDLE',
+    image_custom:       'https://buy.stripe.com/YOUR_IMAGE_CUSTOM',
+    video_single:       'https://buy.stripe.com/YOUR_VIDEO_SINGLE',
+    video_bundle:       'https://buy.stripe.com/YOUR_VIDEO_BUNDLE',
+    video_custom:       'https://buy.stripe.com/YOUR_VIDEO_CUSTOM',
+    // Subscription plans — replace with your Stripe Subscription Links
+    plan_whisper:       'https://buy.stripe.com/YOUR_PLAN_WHISPER',
+    plan_serenity:      'https://buy.stripe.com/YOUR_PLAN_SERENITY',
+    plan_sanctuary:     'https://buy.stripe.com/YOUR_PLAN_SANCTUARY',
+  };
+
+  function goToStripe(linkKey) {
+    const url = STRIPE_LINKS[linkKey];
+    if (!url || url.includes('YOUR_')) {
+      alert('Payments are coming soon! In the meantime please contact us at contact@sondrift.com');
+      return;
+    }
+    window.open(url, '_blank');
+  }
+
+  // Wire up all "Add" buttons to Stripe
+  // Shop product cards — add data-stripe attributes
+  document.querySelectorAll('.btn-add').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const card = this.closest('.product-card');
+      const stripeKey = card ? card.dataset.stripe : null;
+      if (stripeKey) goToStripe(stripeKey);
+      else alert('Payments coming soon! Contact us at contact@sondrift.com');
+    });
+  });
+
+  // Subscription plan CTA buttons
+  document.getElementById('pbtn-w')  && document.getElementById('pbtn-w').addEventListener('click',  () => goToStripe('plan_whisper'));
+  document.getElementById('pbtn-s')  && document.getElementById('pbtn-s').addEventListener('click',  () => goToStripe('plan_serenity'));
+  document.getElementById('pbtn-sa') && document.getElementById('pbtn-sa').addEventListener('click', () => goToStripe('plan_sanctuary'));
+
+  // Modal plan CTA buttons
+  document.querySelectorAll('.modal-plan-cta').forEach((btn, i) => {
+    const keys = ['plan_whisper','plan_serenity','plan_sanctuary'];
+    btn.addEventListener('click', () => goToStripe(keys[i] || 'plan_whisper'));
+  });
+
+  // ============================================
+  // CURRENCY SWITCHER
+  // ============================================
+  const FX = {
+    SGD: { symbol: 'SGD', rate: 1 },
+    USD: { symbol: 'USD', rate: 0.74 },
+    GBP: { symbol: 'GBP', rate: 0.59 },
+    EUR: { symbol: 'EUR', rate: 0.68 },
+    AUD: { symbol: 'AUD', rate: 1.14 },
+    JPY: { symbol: 'JPY', rate: 82.5 },
+    CAD: { symbol: 'CAD', rate: 1.01 },
+  };
+
+  // Base SGD prices for all items
+  const BASE_PRICES = {
+    's1': 6.90, 's2': 24.90, 's3': 18.90,
+    'i1': 4.90, 'i2': 18.90, 'i3': 14.90,
+    'v1': 12.90, 'v2': 29.90, 'v3': 34.90,
+    'plan_w': 19.90, 'plan_s': 39.90, 'plan_sa': 79.90,
+  };
+
+  let currentCurrency = 'SGD';
+
+  function formatPrice(sgdAmount, currency) {
+    const fx = FX[currency];
+    const converted = sgdAmount * fx.rate;
+    if (currency === 'JPY') return fx.symbol + ' ' + Math.round(converted);
+    return fx.symbol + ' ' + converted.toFixed(2);
+  }
+
+  function changeCurrency(currency) {
+    currentCurrency = currency;
+    const fx = FX[currency];
+
+    // Update shop product prices
+    document.querySelectorAll('.product-price').forEach(el => {
+      const span = el.querySelector('span');
+      const key = el.dataset.priceKey;
+      if (key && BASE_PRICES[key] !== undefined) {
+        const formatted = formatPrice(BASE_PRICES[key], currency);
+        const parts = formatted.split(' ');
+        el.innerHTML = `<span>${parts[0]} </span>${parts[1]}`;
+      }
+    });
+
+    // Update plan card prices
+    ['w','s','sa'].forEach(id => {
+      const disp = document.getElementById('pprice-' + id);
+      const key = 'plan_' + id;
+      if (disp && BASE_PRICES[key]) {
+        const val = BASE_PRICES[key] * fx.rate;
+        const whole = currency === 'JPY' ? Math.round(val) : Math.floor(val);
+        const cents = currency === 'JPY' ? '' : ('.' + String(Math.round((val - Math.floor(val))*100)).padStart(2,'0'));
+        disp.innerHTML = `<sup>${fx.symbol} </sup>${whole}<sup>${cents}</sup>`;
+      }
+    });
+
+    // Update shop pricing modal prices
+    Object.entries(BASE_PRICES).forEach(([key, sgdVal]) => {
+      const dispEl = document.getElementById('p-' + key);
+      if (dispEl) dispEl.textContent = formatPrice(sgdVal, currency);
+    });
+  }
+
+  // Attach price keys to product price elements on page load
+  function initPriceKeys() {
+    const priceMap = [
+      // Shop soundbites
+      { cardId: 'sc1', key: 's1' }, { cardId: 'sc2', key: 's1' }, { cardId: 'sc3', key: 's2' },
+      // Shop images
+      { cardId: 'ic1', key: 'i1' }, { cardId: 'ic2', key: 'i1' }, { cardId: 'ic3', key: 'i2' },
+      // Shop videos
+      { cardId: 'vc1', key: 'v1' }, { cardId: 'vc2', key: 'v1' }, { cardId: 'vc3', key: 'v2' },
+    ];
+    priceMap.forEach(({ cardId, key }) => {
+      const card = document.getElementById(cardId);
+      if (card) {
+        card.dataset.stripe = key.startsWith('s') ? 'soundbite_single' :
+                              key.startsWith('i') ? 'image_single' : 'video_single';
+        const priceEl = card.querySelector('.product-price');
+        if (priceEl) priceEl.dataset.priceKey = key;
+      }
+    });
+  }
+  initPriceKeys();
+
+  function switchTabByName(id) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    const tab = document.querySelector(`.tab[onclick*="${id}"]`);
+    if (tab) tab.classList.add('active');
+    const content = document.getElementById(id);
+    if (content) content.classList.add('active');
+  }
+
+  // ============================================
+  // CONTACT FORM (Formspree)
+  // ============================================
+  async function handleFormSubmit(e) {
+    e.preventDefault();
+    const form = document.getElementById('customRequestForm');
+    const btn  = document.getElementById('formSubmitBtn');
+    const ok   = document.getElementById('formSuccess');
+    const err  = document.getElementById('formError');
+
+    btn.textContent = 'Sending…';
+    btn.disabled = true;
+    ok.style.display = 'none';
+    err.style.display = 'none';
+
+    try {
+      const res = await fetch(form.action, {
+        method: 'POST',
+        body: new FormData(form),
+        headers: { 'Accept': 'application/json' }
+      });
+      if (res.ok) {
+        ok.style.display = 'block';
+        form.reset();
+        btn.textContent = 'Sent ✓';
+        setTimeout(() => { btn.textContent = 'Send Request'; btn.disabled = false; }, 3000);
+      } else {
+        throw new Error('failed');
+      }
+    } catch {
+      err.style.display = 'block';
+      btn.textContent = 'Send Request';
+      btn.disabled = false;
+    }
+  }
 </script>
+
+<!-- ============================================
+     LEGAL MODALS
+============================================ -->
+
+<!-- Privacy Policy -->
+<div class="modal-backdrop" id="privacyModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-header-left">
+        <div class="modal-eyebrow">Legal</div>
+        <h2 class="modal-title">Privacy <em>Policy</em></h2>
+      </div>
+      <div class="modal-header-right">
+        <button class="btn-modal-close" onclick="closeModal('privacyModal')">
+          <svg viewBox="0 0 12 12" fill="none"><path d="M2 2L10 10M10 2L2 10" stroke-width="1.5"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="modal-body" style="font-size:0.82rem;line-height:1.9;color:var(--light-mid)">
+      <p style="margin-bottom:1rem;color:var(--silver)">Last updated: May 2026</p>
+
+      <p style="margin-bottom:1.2rem">Sondrift Studio ("<strong style="color:var(--white)">we</strong>", "<strong style="color:var(--white)">us</strong>", or "<strong style="color:var(--white)">our</strong>") is committed to protecting your personal information. This policy explains what data we collect, how we use it, and your rights — wherever you are in the world.</p>
+
+      <p style="font-size:0.7rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--silver);margin-bottom:0.5rem;margin-top:1.5rem">1. Information We Collect</p>
+      <p style="margin-bottom:1rem">We collect information you provide directly: your name, email address, country, and content preferences when you submit a custom request or purchase. We also collect payment information processed securely by Stripe — we never store your card details. We automatically collect basic usage data such as pages visited and time spent, via analytics tools.</p>
+
+      <p style="font-size:0.7rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--silver);margin-bottom:0.5rem;margin-top:1.5rem">2. How We Use Your Information</p>
+      <p style="margin-bottom:1rem">We use your information to: fulfil your orders and deliver digital content to your inbox; respond to your custom requests; send you content as part of your subscription plan; communicate important account updates; and improve our services. We do not sell, rent, or share your personal data with third parties for marketing purposes.</p>
+
+      <p style="font-size:0.7rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--silver);margin-bottom:0.5rem;margin-top:1.5rem">3. International Data Transfers</p>
+      <p style="margin-bottom:1rem">Sondrift serves customers worldwide. Your data may be processed in countries outside your own, including Singapore and the United States. We ensure appropriate safeguards are in place in compliance with applicable laws including GDPR (EU/UK), PDPA (Singapore), and other applicable regional privacy regulations.</p>
+
+      <p style="font-size:0.7rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--silver);margin-bottom:0.5rem;margin-top:1.5rem">4. Your Rights</p>
+      <p style="margin-bottom:1rem">Depending on your location, you may have the right to: access the personal data we hold about you; correct inaccurate data; request deletion of your data; withdraw consent at any time; and lodge a complaint with your local data protection authority. To exercise any of these rights, contact us at <strong style="color:var(--white)">contact@sondrift.com</strong>.</p>
+
+      <p style="font-size:0.7rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--silver);margin-bottom:0.5rem;margin-top:1.5rem">5. Cookies</p>
+      <p style="margin-bottom:1rem">We use minimal cookies necessary for the website to function. We do not use advertising cookies or sell data to advertisers. You may disable cookies in your browser settings.</p>
+
+      <p style="font-size:0.7rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--silver);margin-bottom:0.5rem;margin-top:1.5rem">6. Contact</p>
+      <p>For privacy-related enquiries: <strong style="color:var(--white)">contact@sondrift.com</strong></p>
+    </div>
+  </div>
+</div>
+
+<!-- Terms of Service -->
+<div class="modal-backdrop" id="termsModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-header-left">
+        <div class="modal-eyebrow">Legal</div>
+        <h2 class="modal-title">Terms of <em>Service</em></h2>
+      </div>
+      <div class="modal-header-right">
+        <button class="btn-modal-close" onclick="closeModal('termsModal')">
+          <svg viewBox="0 0 12 12" fill="none"><path d="M2 2L10 10M10 2L2 10" stroke-width="1.5"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="modal-body" style="font-size:0.82rem;line-height:1.9;color:var(--light-mid)">
+      <p style="margin-bottom:1rem;color:var(--silver)">Last updated: May 2026</p>
+
+      <p style="margin-bottom:1.2rem">By accessing or purchasing from Sondrift Studio, you agree to the following terms. Please read them carefully.</p>
+
+      <p style="font-size:0.7rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--silver);margin-bottom:0.5rem;margin-top:1.5rem">1. Digital Products</p>
+      <p style="margin-bottom:1rem">All products sold by Sondrift Studio are digital goods delivered electronically. Upon successful payment, you will receive access to your files via email delivery. Files are for personal, non-commercial use only. You may not redistribute, resell, or publicly broadcast any content purchased from Sondrift.</p>
+
+      <p style="font-size:0.7rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--silver);margin-bottom:0.5rem;margin-top:1.5rem">2. Custom Orders</p>
+      <p style="margin-bottom:1rem">Custom content is created exclusively for the requesting customer and will not be resold or reused. Delivery timelines are estimates and may vary. One revision is included with each custom order. Additional revisions may be requested at an additional fee.</p>
+
+      <p style="font-size:0.7rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--silver);margin-bottom:0.5rem;margin-top:1.5rem">3. Subscriptions</p>
+      <p style="margin-bottom:1rem">Subscription plans renew automatically on a monthly basis. You may cancel at any time from your account or by emailing us. Cancellations take effect at the end of your current billing period. No partial refunds are issued for unused days within a billing period.</p>
+
+      <p style="font-size:0.7rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--silver);margin-bottom:0.5rem;margin-top:1.5rem">4. Intellectual Property</p>
+      <p style="margin-bottom:1rem">All content created and sold by Sondrift Studio remains the intellectual property of Sondrift Studio. Purchase grants you a personal, non-exclusive, non-transferable licence to use the content for personal purposes only.</p>
+
+      <p style="font-size:0.7rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--silver);margin-bottom:0.5rem;margin-top:1.5rem">5. Payments</p>
+      <p style="margin-bottom:1rem">All payments are processed securely by Stripe. Prices are displayed in your selected currency and are subject to exchange rate fluctuations. Sondrift is not responsible for any fees charged by your bank or card issuer.</p>
+
+      <p style="font-size:0.7rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--silver);margin-bottom:0.5rem;margin-top:1.5rem">6. Governing Law</p>
+      <p>These terms are governed by the laws of Singapore. Disputes shall be resolved through good-faith negotiation, and if necessary, through the courts of Singapore.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Refund Policy -->
+<div class="modal-backdrop" id="refundModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-header-left">
+        <div class="modal-eyebrow">Legal</div>
+        <h2 class="modal-title">Refund <em>Policy</em></h2>
+      </div>
+      <div class="modal-header-right">
+        <button class="btn-modal-close" onclick="closeModal('refundModal')">
+          <svg viewBox="0 0 12 12" fill="none"><path d="M2 2L10 10M10 2L2 10" stroke-width="1.5"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="modal-body" style="font-size:0.82rem;line-height:1.9;color:var(--light-mid)">
+      <p style="margin-bottom:1rem;color:var(--silver)">Last updated: May 2026</p>
+
+      <p style="font-size:0.7rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--silver);margin-bottom:0.5rem;margin-top:1.5rem">Ready-Made Digital Products</p>
+      <p style="margin-bottom:1rem">Due to the nature of digital goods, all sales of ready-made soundbites, images, and videos are <strong style="color:var(--white)">final and non-refundable</strong> once the file has been delivered. If you experience a technical issue preventing you from accessing your purchase, please contact us within 7 days and we will resolve it promptly.</p>
+
+      <p style="font-size:0.7rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--silver);margin-bottom:0.5rem;margin-top:1.5rem">Custom Orders</p>
+      <p style="margin-bottom:1rem">Custom orders may be cancelled for a full refund within <strong style="color:var(--white)">24 hours of payment</strong>, provided production has not yet begun. Once work has commenced, refunds are not available. If you are unsatisfied with your custom content, we will offer one complimentary revision.</p>
+
+      <p style="font-size:0.7rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--silver);margin-bottom:0.5rem;margin-top:1.5rem">Subscriptions</p>
+      <p style="margin-bottom:1rem">You may cancel your subscription at any time. Your plan will remain active until the end of the current billing cycle. <strong style="color:var(--white)">No refunds are issued for partial months.</strong> If content was not delivered within the agreed timeframe due to our error, you may request a credit toward your next billing cycle.</p>
+
+      <p style="font-size:0.7rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--silver);margin-bottom:0.5rem;margin-top:1.5rem">How to Request a Refund</p>
+      <p>Email us at <strong style="color:var(--white)">contact@sondrift.com</strong> with your order details and the reason for your request. We aim to respond within 2 business days. We are committed to resolving all concerns fairly and promptly.</p>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
