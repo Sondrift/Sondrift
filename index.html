@@ -2235,8 +2235,8 @@
       <div style="margin-top:1.2rem">
         <label style="font-size:0.55rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--mid);display:block;margin-bottom:0.4rem">Currency</label>
         <select id="currencySelect" onchange="changeCurrency(this.value)" style="background:var(--dark);border:1px solid rgba(255,255,255,0.1);color:var(--silver);padding:0.4rem 0.8rem;font-family:var(--sans);font-size:0.75rem;outline:none;cursor:pointer">
-          <option value="SGD" selected>SGD — Singapore Dollar</option>
-          <option value="USD">USD — US Dollar</option>
+          <option value="SGD">SGD — Singapore Dollar</option>
+          <option value="USD" selected>USD — US Dollar</option>
           <option value="GBP">GBP — British Pound</option>
           <option value="EUR">EUR — Euro</option>
           <option value="AUD">AUD — Australian Dollar</option>
@@ -3480,7 +3480,7 @@
     'plan_w': 19.90, 'plan_s': 39.90, 'plan_sa': 79.90,
   };
 
-  let currentCurrency = 'SGD';
+  let currentCurrency = 'USD';
 
   function formatPrice(sgdAmount, currency) {
     const fx = FX[currency];
@@ -3544,6 +3544,7 @@
     });
   }
   initPriceKeys();
+  changeCurrency('USD');
 
   function switchTabByName(id) {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
