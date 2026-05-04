@@ -3828,6 +3828,9 @@
     const plans = [['Whisper','plan_whisper'],['Serenity','plan_serenity'],['Sanctuary','plan_sanctuary']];
     if (plans[i]) btn.onclick = () => planCTA(...plans[i]);
   });
+
+  // Toggle controls panel on button click if image already set
+  uploadBtn.addEventListener('click', function(e) {
     if (hasImage) {
       e.preventDefault();
       e.stopPropagation();
